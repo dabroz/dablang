@@ -1,0 +1,10 @@
+rm *.cpp
+rm *.h
+flex -L dab.l
+bison -v -d -l dab.y
+sleep 1
+tail -n +3 lex.yy.c > l2
+rm lex.yy.c
+mv l2 dab_lexer.cpp
+mv dab.tab.c dab_parser.cpp
+mv dab.tab.h dab_symbols.h
