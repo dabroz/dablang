@@ -8,7 +8,7 @@ public:
 	virtual bool isVararg() const { return true; }
 	static qneu_VarargType * get() { static qneu_VarargType * ret = new qneu_VarargType; return ret; }
 
-	virtual Type * llvm() { qdterror("LLVM VARARG!"); return 0; }
+	virtual llvm::Type * llvm() { qdterror("LLVM VARARG!"); return 0; }
 private:
 	qneu_VarargType() { }
 };

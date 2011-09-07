@@ -195,3 +195,8 @@ dt_BaseType * qneu_ArrayType::updateWithType( const qString & newname,dt_BaseTyp
 {
 	return base->updateWithType(newname,s)->CreateArray(new qConstant(TYPE_INT32, size));
 }
+
+llvm::Value * dt_BaseType::getLllvVariable( qString name, Value * parent )
+{
+	return 0;
+}

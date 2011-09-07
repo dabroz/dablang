@@ -1,17 +1,10 @@
-#include "qdt3.h"
+#include "stdafx.h"
 
 //#define WXUSINGDLL
 #define wxUSE_EXTENDED_RTTI 1
 
 qValue * compileText(std::map<qString, qString> & filemap);
 
-#include <wx/wx.h>
-
-#include <wx/splitter.h>
-#include <wx/listctrl.h>
-#include <wx/notebook.h>
-#include <wx/fontutil.h>
-#include <wx/stc/stc.h>
 
 #ifdef _DEBUG
 #pragma comment(lib, "wxbase29ud.lib")
@@ -32,6 +25,8 @@ qValue * compileText(std::map<qString, qString> & filemap);
 #pragma comment(lib, "wxscintilla.lib")
 #pragma comment(lib, "wxzlib.lib")
 #endif
+#pragma comment(lib, "comctl32.lib")
+#pragma comment(lib, "rpcrt4.lib")
 
 class MyApp : public wxApp
 {
@@ -163,13 +158,63 @@ enum
 	ID_MENURUN,
 	ID_MENUUPDATE
 };
-bool runCode(qValue * prog);
+
+void setFile(const char *name, const qString&body)
+{
+	// PLACEHOLDER
+}
+
+bool runCode(qValue * prog)
+{
+	// PLACEHOLDER
+	return false;
+}
+
+void SpawnProcek(qString & ss)
+{
+	// PLACEHOLDER
+}
+
+qValue * compileText(std::map<qString, qString> & filemap)
+{
+	// PLACEHOLDER
+	return 0;
+}
+
+void StopProcIfRunning()
+{
+	// PLACEHOLDER
+}
 
 void turboRun( std::string & ll  ) 
 {
-	void SpawnProcek(qString & ss);
 	SpawnProcek(ll);
 }
+
+bool dablangIsProcessRunning()
+{
+	// PLACEHOLDER
+	return false;
+}
+
+void SendUpdatesToProcess(const char *txt)
+{
+	// PLACEHOLDER
+}
+
+
+bool subupdatecompiled(const char *txt, qValue * last)
+{
+	// PLACEHOLDER
+	return false;
+}
+
+// TEMPORARY
+extern std::vector<qError> compileErrors;
+std::vector<qError> compileErrors;
+
+extern std::map<qString, std::vector<qneu_Function *>> functions;
+std::map<qString, std::vector<qneu_Function *>> functions;
 
 class MyFrame : public wxFrame
 {
@@ -197,13 +242,12 @@ public:
 
 	void OnMenuRunUpdate(wxCommandEvent& Event)
 	{
-		bool dablangIsProcessRunning();
+		
 		if (!dablangIsProcessRunning()) return;
 
 		int s = editors->GetSelection();
 
-		bool subupdatecompiled(const char *txt, qValue * last);
-		void SendUpdatesToProcess(const char *txt);
+		
 		if (subupdatecompiled(_codes[s]->GetText().c_str().AsChar(), lastCompile))
 		{
 			SendUpdatesToProcess(_codes[s]->GetText().c_str().AsChar());
@@ -380,7 +424,6 @@ public:
 
 			qString word = line.substr(startword,pos-startword-1).c_str().AsChar();
 
-			extern std::map<qString, std::vector<qneu_Function *>> functions;
 
 			if (functions.count(word))
 			{
@@ -679,7 +722,7 @@ public:
 			if (wxNO == wxMessageBox("Application is already running. Do you want to restart it?", "Dablang IDE", wxYES_NO | wxCENTRE | wxICON_EXCLAMATION))
 				return;
 			else
-			{ void StopProcIfRunning(); StopProcIfRunning(); }
+			{  StopProcIfRunning(); }
 		}
 		if (Compile())
 		{
@@ -717,8 +760,6 @@ public:
 		_dirtyflag[s] = 0;
 
 		UpdateDirtyMarkers();
-
-		void setFile(const char *name, const qString&body);
 
 		setFile(fn.c_str().AsChar(), body.c_str().AsChar());
 	}
@@ -768,3 +809,9 @@ bool MyApp::OnInit()
 }
 
 void goIDE() { wxEntry(0,0); }
+
+int WINAPI WinMain(HINSTANCE hinstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) 
+{
+	goIDE();
+	return 0;
+}

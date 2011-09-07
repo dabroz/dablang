@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 10.00
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dab-core", "dab-core.vcproj", "{BC927B63-816D-47B8-9B02-A574C7546AEB}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dab-ide", "dab-ide.vcproj", "{42DDCEF1-706B-49B4-BF7C-494C9A50B076}"
+	ProjectSection(ProjectDependencies) = postProject
+		{BC927B63-816D-47B8-9B02-A574C7546AEB} = {BC927B63-816D-47B8-9B02-A574C7546AEB}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

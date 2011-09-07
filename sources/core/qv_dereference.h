@@ -7,6 +7,6 @@ public:
 	qString print(int indent);
 	virtual void subupdateType();
 	virtual llvm::Value * BuildValue() ;
-	virtual Value * getLlvmVariable();
+	virtual llvm::Value * getLlvmVariable();
 };
 

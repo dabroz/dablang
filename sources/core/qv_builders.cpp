@@ -167,13 +167,13 @@ qValue* qtree_type(qValue * v)
 	return new qTypeHolder(t);
 }
 
-qValue * QCODE(int pos, qValue *r)
+DABCORE_API qValue * QCODE(int pos, qValue *r)
 {
 	r->loc.cmp_pos = pos;
 	return r;
 }
 
-qValue * QCODEY(qValue * from, qValue * to)
+DABCORE_API qValue * QCODEY(qValue * from, qValue * to)
 {
 	to->loc = from->loc;
 	return to;

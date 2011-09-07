@@ -1,5 +1,11 @@
 #pragma once
 
+#ifdef DABCORE_EXPORTS
+#define DABCORE_API __declspec(dllexport)
+#else
+#define DABCORE_API __declspec(dllimport)
+#endif
+
 class qValue;
 typedef std::string qString;
 typedef std::vector<qValue*> qValueVec;
@@ -7,11 +13,11 @@ typedef qValueVec::iterator qValueIterator;
 
 bool ShouldWriteOutput();
 
-int qdtprintf(const char * format, ...);
-int qdtprintf2(const char * format, ...);
-void qdterror(const char * format, ...);
+DABCORE_API int qdtprintf(const char * format, ...);
+DABCORE_API int qdtprintf2(const char * format, ...);
+DABCORE_API void qdterror(const char * format, ...);
 
-void replace_all(std::string &str, const std::string &find_what, const std::string &replace_with);
+DABCORE_API void replace_all(std::string &str, const std::string &find_what, const std::string &replace_with);
 
 enum
 {
@@ -35,7 +41,7 @@ enum
 	TYPE_DOUBLE,
 };
 
-struct float4
+struct DABCORE_API float4
 {
 	union
 	{
@@ -44,7 +50,7 @@ struct float4
 	};
 };
 
-struct parse_parm
+struct DABCORE_API parse_parm
 {
 	void		*yyscanner;
 	char		*buf;
@@ -67,7 +73,7 @@ void    yyerror(parse_parm *parm,void*scanner,const char*msg);
 
 #define YYDEBUG 1
 
-struct qError
+struct DABCORE_API qError
 {
 	int num;
 	int error; // 1 error 0 warning
@@ -89,8 +95,8 @@ struct qError
 
 extern std::vector<qError> compileErrors;
 
-qValue * QCODE(int pos, qValue *r);
-qValue * QCODEY(qValue * from, qValue * to);
+DABCORE_API qValue * QCODE(int pos, qValue *r);
+DABCORE_API qValue * QCODEY(qValue * from, qValue * to);
 
 enum 
 {
@@ -121,7 +127,7 @@ inline qString doIndent(int indent)
 
 typedef int int32_t;
 
-struct FunctionArg
+struct DABCORE_API FunctionArg
 {
 	qString name;
 	class dt_BaseType * type;
@@ -129,7 +135,7 @@ struct FunctionArg
 	llvm::Value * llvmreef;
 };
 
-class qneu_Function
+class DABCORE_API qneu_Function
 {
 public:
 	qString mangle;
@@ -141,7 +147,7 @@ public:
 
 	qneu_Function(class qFunction * fun);
 
-	Function * llvmd;
+	llvm::Function * llvmd;
 	bool isvararg() const ;
 };
 
@@ -173,7 +179,7 @@ public:
 
 	virtual bool can_cast_to(dt_BaseType * other) const { return false; }
 	virtual llvm::Type * llvm() = 0;
-	virtual llvm::Value * getLllvVariable( qString name, Value * parent ) {return 0;}
+	virtual llvm::Value * getLllvVariable( qString name, llvm::Value * parent );
 	virtual dt_BaseType * createPointer();
 	virtual dt_BaseType * createConstPointer();
 	virtual dt_BaseType * updateWithType( const qString & newname,class dt_BaseType * s ) { return this; }
@@ -199,7 +205,7 @@ inline dt_BaseType * dt_BaseType ::createConstPointer()
 	return qneu_PointerType::get(this, true);
 }
 
-struct QQLOC
+struct DABCORE_API QQLOC
 {
 	qString cmp_file;
 	int cmp_pos;
@@ -209,7 +215,7 @@ struct QQLOC
 	QQLOC() : cmp_file(""), cmp_pos(0), cmp_line(-1), cmp_col(-1) {};
 };
 
-class qValue
+class DABCORE_API qValue
 {
 public:
 	 QQLOC loc;
@@ -220,7 +226,7 @@ public:
 
 	virtual llvm::Value * BuildValue() { return 0; }
 
-	virtual Value * getLlvmVariable() { return 0; }
+	virtual llvm::Value * getLlvmVariable() { return 0; }
 
 	bool remove_from_parent()
 	{
@@ -389,9 +395,6 @@ qValue* qtree_struct(qValue * name, qValue * seq);
 qValue* qtree_smember(qValue * type, qValue * name);
 qValue* qtree_vararg();
 
-extern IRBuilder<> Builder;
-
-
 void debugqv(const char * name, ...);
 
 #define DEBUGQ(...) debugqv(__FUNCTION__, ##__VA_ARGS__,0)
@@ -409,9 +412,9 @@ void low_CheckTypes(qValue * v);
 
 qString  RunLLVMBuilding(qValue * prog);
 
-Value * Lconstant(int v);
-Value * Lconstant(float v);
-Value * Lconstant(bool v);
+llvm::Value * Lconstant(int v);
+llvm::Value * Lconstant(float v);
+llvm::Value * Lconstant(bool v);
 
 #include "qv_instruction.h"
 #include "qv_constant.h"

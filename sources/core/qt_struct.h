@@ -29,5 +29,5 @@ public:
 	virtual dt_BaseType * CreateConst() { return constver; }
 
 	virtual llvm::Type * llvm();
-	virtual Value * getLllvVariable( qString name, Value * parent ) ;
+	virtual llvm::Value * getLllvVariable( qString name, llvm::Value * parent ) ;
 };

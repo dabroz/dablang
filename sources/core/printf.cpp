@@ -16,7 +16,7 @@ void AddDablangStatus2(const qString & ss)
 	// PLACEHOLDER
 }
 
-int qdtprintf(const char * format, ...)
+DABCORE_API int qdtprintf(const char * format, ...)
 {
 	char data[1024 * 16];
 	va_list args;
@@ -31,7 +31,7 @@ int qdtprintf(const char * format, ...)
 	return q;
 }
 
-int qdtprintf2(const char * format, ...)
+DABCORE_API int qdtprintf2(const char * format, ...)
 {
 	char data[1024 * 16];
 	va_list args;
@@ -50,7 +50,7 @@ int qdtprintf2(const char * format, ...)
 	return q;
 }
 
-void qdterror(const char * format, ...)
+DABCORE_API void qdterror(const char * format, ...)
 {
 	char data[1024 * 16];
 	va_list args;
@@ -67,7 +67,7 @@ void qdterror(const char * format, ...)
 	DebugBreak();
 }
 
-void replace_all(std::string &str, const std::string &find_what, const std::string &replace_with)
+DABCORE_API void replace_all(std::string &str, const std::string &find_what, const std::string &replace_with)
 {
 	std::string::size_type pos=0;
 	while((pos=str.find(find_what, pos))!=std::string::npos)

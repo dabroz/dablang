@@ -5,10 +5,10 @@ class qFunction : public qValue
 public:
 	qneu_Function * func;
 
-	Value * VarArg(qString mangledName);
-	Value * VarLocal(qString mangledName);
-	Value * VarGlobal( qString realname );
-	Value * getVariable(qString realname);
+	llvm::Value * VarArg(qString mangledName);
+	llvm::Value * VarLocal(qString mangledName);
+	llvm::Value * VarGlobal( qString realname );
+	llvm::Value * getVariable(qString realname);
 
 	qFunction(qValue* _type, qValue* _name, qValue* _arglist, qValue* _body);
 	qString print(int indent);
@@ -18,7 +18,7 @@ public:
 	virtual void LLVM_update();
 
 protected:
-	llvm::Function *CreateFun(Module *module);
+	llvm::Function *CreateFun(llvm::Module *module);
 	void InsertArgs( llvm::Function * F );
 	qFunction() { func = 0; }
 };

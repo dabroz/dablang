@@ -14,6 +14,6 @@ public:
 	virtual void subupdateType();
 
 	virtual llvm::Value * BuildValue() ;
-	Value * CreateSubvalue(bool named);
+	llvm::Value * CreateSubvalue(bool named);
 	bool LLVM_build( llvm::Module * module );
 };

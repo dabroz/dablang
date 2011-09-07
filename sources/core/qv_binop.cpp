@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "dab_header.h"
+#include "dab_internal.h"
 
 dt_BaseType * tryret(qValue * binop, dt_BaseType *v,dt_BaseType * tt,const qString & c, const char * dat[], int count, dt_BaseType * uptype = 0)
 {

@@ -17,6 +17,6 @@ public:
 
 	qString subdump() { return realname; }
 
-	virtual Value * getLlvmVariable();
+	virtual llvm::Value * getLlvmVariable();
 	virtual llvm::Value * BuildValue() ;
 };

@@ -7,10 +7,7 @@ public:
 	virtual qString name() const { return "cstring"; }
 	virtual qString mangle() const { return "s"; }
 	qneu_CStringType() {  }
-	virtual llvm::Type * llvm()
-	{
-		return Type::getInt8PtrTy(getGlobalContext());
-	}
+	virtual llvm::Type * llvm();
 	virtual bool can_cast_to(dt_BaseType * other) const 
 	{
 		if (other->isPointer()) return true;

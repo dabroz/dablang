@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "dab_header.h"
+#include "dab_internal.h"
 
 bool qIf::LLVM_build( llvm::Module * module )
 {

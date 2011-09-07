@@ -197,6 +197,14 @@
 						UsePrecompiledHeader="1"
 					/>
 				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="1"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\sources\core\stdafx.h"
@@ -552,6 +560,10 @@
 			>
 			<File
 				RelativePath="..\sources\core\dab_header.h"
+				>
+			</File>
+			<File
+				RelativePath="..\sources\core\dab_internal.h"
 				>
 			</File>
 		</Filter>
