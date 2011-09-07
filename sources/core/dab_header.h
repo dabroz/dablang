@@ -124,7 +124,7 @@ typedef int int32_t;
 struct FunctionArg
 {
 	qString name;
-	class qneu_Type * type;
+	class dt_BaseType * type;
 
 	llvm::Value * llvmreef;
 };
@@ -136,7 +136,7 @@ public:
 	qString mangled_name;
 
 	qString name;
-	class qneu_Type * returntype;
+	class dt_BaseType * returntype;
 	std::vector<FunctionArg> args;
 
 	qneu_Function(class qFunction * fun);
@@ -145,7 +145,7 @@ public:
 	bool isvararg() const ;
 };
 
-class qneu_Type
+class DABCORE_API dt_BaseType
 {
 public:
 
@@ -154,11 +154,11 @@ public:
 
 	std::map<int, class qneu_ArrayType * > arraytypes;
 
-	qneu_Type() : ptrtype(0),ptrconsttype(0),is_const(0) {};
+	dt_BaseType() : ptrtype(0),ptrconsttype(0),is_const(0) {};
 
 	bool is_const;
 	virtual bool isConst() const { return is_const; }
-	virtual qneu_Type * CreateConst() { return 0; }
+	virtual dt_BaseType * CreateConst() { return 0; }
 
 	virtual bool isPrimitive() const { return false; }
 	virtual bool isStruct() const { return false; }
@@ -171,13 +171,13 @@ public:
 	virtual qString name() const { return "{??}"; }
 	virtual qString mangle() const { return "?"; }
 
-	virtual bool can_cast_to(qneu_Type * other) const { return false; }
+	virtual bool can_cast_to(dt_BaseType * other) const { return false; }
 	virtual llvm::Type * llvm() = 0;
 	virtual llvm::Value * getLllvVariable( qString name, Value * parent ) {return 0;}
-	virtual qneu_Type * createPointer();
-	virtual qneu_Type * createConstPointer();
-	virtual qneu_Type * updateWithType( const qString & newname,class qneu_Type * s ) { return this; }
-	virtual qneu_Type * CreateArray(qValue * size);
+	virtual dt_BaseType * createPointer();
+	virtual dt_BaseType * createConstPointer();
+	virtual dt_BaseType * updateWithType( const qString & newname,class dt_BaseType * s ) { return this; }
+	virtual dt_BaseType * CreateArray(qValue * size);
 };
 
 #include "qt_array.h"
@@ -189,12 +189,12 @@ public:
 #include "qt_cstring.h"
 #include "qt_void.h"
 
-inline qneu_Type * qneu_Type ::createPointer()
+inline dt_BaseType * dt_BaseType ::createPointer()
 {
 	return qneu_PointerType::get(this, false);
 }
 
-inline qneu_Type * qneu_Type ::createConstPointer()
+inline dt_BaseType * dt_BaseType ::createConstPointer()
 {
 	return qneu_PointerType::get(this, true);
 }
@@ -268,7 +268,7 @@ public:
 		return false;
 	}
 
-	qneu_Type * neu_type;
+	dt_BaseType * neu_type;
 	qValue * parent;
 	std::vector<class qDeclare*> variablesavail;
 	struct { float x, y, z, w; } value;
@@ -349,7 +349,7 @@ public:
 
 	void fireError(bool error, int num, const qString & desc);
 
-	void updateNewType( const qString & name, qneu_Type * s ) ;
+	void updateNewType( const qString & name, dt_BaseType * s ) ;
 
 
 	virtual bool IsNoValue() { return false; }
@@ -357,7 +357,7 @@ public:
 
 };
 
-inline qString printType(qneu_Type * type)
+inline qString printType(dt_BaseType * type)
 {
 	if (!type) return "###";
 	return type->name();

@@ -132,7 +132,7 @@ qValue * qtree_smember(qValue * type, qValue * name)
 
 qValue* qtree_type(qValue * v)
 {
-	qneu_Type * t = 0;
+	dt_BaseType * t = 0;
 	if (v->name == "float") t = qneu_PrimitiveType::type_float();
 	if (v->name == "float4") t = qneu_PrimitiveType::type_float4();
 	if (v->name == "int") t = qneu_PrimitiveType::type_int();
@@ -156,7 +156,7 @@ qValue* qtree_type(qValue * v)
 
 	if (t==0)
 	{
-		qneu_Type * TryAddStruct(qString & name);
+		dt_BaseType * TryAddStruct(qString & name);
 		t = TryAddStruct(v->name);
 		if (!t)
 		{

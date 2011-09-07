@@ -83,7 +83,7 @@ void debugqv(const char * name, ...)
 	va_end(list);
 }
 
-qString mangleType(qneu_Type * type)
+qString mangleType(dt_BaseType * type)
 {
 	return type->mangle();
 }

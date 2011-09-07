@@ -1,6 +1,6 @@
 #pragma once
 
-class qArrayAccess : public qValue
+class DABCORE_API qArrayAccess : public qValue
 {
 public:
 	qArrayAccess(qValue *var, qValue * index);

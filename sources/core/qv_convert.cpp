@@ -8,8 +8,8 @@ llvm::Value * qConvert::BuildValue()
 	Value * V = L()->BuildValue();
 	Type * DT = neu_type->llvm();
 
-	qneu_Type * Ltype = L()->neu_type;
-	qneu_Type * Rtype = neu_type;
+	dt_BaseType * Ltype = L()->neu_type;
+	dt_BaseType * Rtype = neu_type;
 
 	qneu_PrimitiveType * LL = dynamic_cast<qneu_PrimitiveType *>(Ltype);
 	qneu_PrimitiveType * RR = dynamic_cast<qneu_PrimitiveType *>(Rtype);
@@ -105,7 +105,7 @@ llvm::Value * qConvert::BuildValue()
 	return 0;
 }
 
-qConvert::qConvert( qneu_Type * type, qValue * val, const qString &extrainfo )
+qConvert::qConvert( dt_BaseType * type, qValue * val, const qString &extrainfo )
 {
 	bool forced=(extrainfo=="!!");
 

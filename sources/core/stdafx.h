@@ -1,5 +1,11 @@
 #pragma once
 
+#ifdef DABCORE_EXPORTS
+#define DABCORE_API __declspec(dllexport)
+#else
+#define DABCORE_API __declspec(dllimport)
+#endif
+
 #define __STDC_LIMIT_MACROS
 #define __STDC_CONSTANT_MACROS
 

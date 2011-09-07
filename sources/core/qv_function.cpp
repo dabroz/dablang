@@ -9,7 +9,7 @@ llvm::Function * qFunction::CreateFun(Module *module)
 	bool vararg = false;
 	for (int i = 0; i < func->args.size(); i++)
 	{
-		qneu_Type * TT = func->args[i].type;
+		dt_BaseType * TT = func->args[i].type;
 		if (TT->isVararg()) 
 			vararg = true;
 		else

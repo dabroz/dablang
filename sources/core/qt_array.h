@@ -1,9 +1,9 @@
 #pragma once
 
-class qneu_ArrayType : public qneu_Type
+class qneu_ArrayType : public dt_BaseType
 {
 public:
-	qneu_Type * base;
+	dt_BaseType * base;
 	int size;
 
 	virtual qString name() const ;
@@ -13,9 +13,9 @@ public:
 
 	virtual llvm::Type * llvm();
 
-	virtual bool can_cast_to(qneu_Type * other) const;
+	virtual bool can_cast_to(dt_BaseType * other) const;
 
-	virtual qneu_Type * updateWithType( const qString & newname,qneu_Type * s );
+	virtual dt_BaseType * updateWithType( const qString & newname,dt_BaseType * s );
 public:
-	static qneu_ArrayType * get(qneu_Type * basetype, qValue * size);
+	static qneu_ArrayType * get(dt_BaseType * basetype, qValue * size);
 };

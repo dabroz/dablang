@@ -1,6 +1,6 @@
 #pragma once
 
-class qneu_VoidType : public qneu_Type
+class DABCORE_API qneu_VoidType : public dt_BaseType
 {
 public:
 	qneu_VoidType() { }

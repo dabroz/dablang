@@ -3,7 +3,7 @@
 
 IRBuilder<> Builder(getGlobalContext());
 
-qneu_PointerType * qneu_PointerType::get(qneu_Type * basetype, bool ptrconst)
+qneu_PointerType * qneu_PointerType::get(dt_BaseType * basetype, bool ptrconst)
 {
 	if (ptrconst)
 	{
@@ -21,7 +21,7 @@ qneu_PointerType * qneu_PointerType::get(qneu_Type * basetype, bool ptrconst)
 	}
 }
 
-bool qneu_PrimitiveType::can_cast_to(qneu_Type * other) const
+bool qneu_PrimitiveType::can_cast_to(dt_BaseType * other) const
 {
 	qneu_PrimitiveType* pother = dynamic_cast<qneu_PrimitiveType*>(other);
 	if (!pother) return false;
@@ -102,7 +102,7 @@ llvm::Type * qneu_VoidType::llvm()
 	return llvm::Type::getVoidTy(llvm::getGlobalContext());
 }
 
-qneu_Type * qneu_StructType::GetTypeFor(qString membname) 
+dt_BaseType * qneu_StructType::GetTypeFor(qString membname) 
 {
 	for (int i =0;i<members.size();i++) 
 	{
@@ -127,7 +127,7 @@ Value * qneu_StructType::getLllvVariable( qString name, Value * parent )
 	return Builder.CreateGEP(parent, llvm::ArrayRef<Value*>(gepp));
 }
 
-qneu_Type *  qneu_RawType::updateWithType( const qString & newname,qneu_Type * s )
+dt_BaseType *  qneu_RawType::updateWithType( const qString & newname,dt_BaseType * s )
 {
 	if (tname == newname && is_const == s->is_const)
 	{
@@ -136,7 +136,7 @@ qneu_Type *  qneu_RawType::updateWithType( const qString & newname,qneu_Type * s
 	return this;
 }
 
-bool qneu_PointerType::can_cast_to( qneu_Type * other ) const
+bool qneu_PointerType::can_cast_to( dt_BaseType * other ) const
 {
 	if (other->isPointer()) return true;
 	if (other->is_integer()) return true;
@@ -149,7 +149,7 @@ llvm::Type * qneu_ArrayType::llvm()
 	return ArrayType::get(base->llvm(), size);
 }
 
-bool qneu_ArrayType::can_cast_to( qneu_Type * other ) const
+bool qneu_ArrayType::can_cast_to( dt_BaseType * other ) const
 {
 	if (other->isPointer()) return true;
 	return false;
@@ -169,7 +169,7 @@ qString qneu_ArrayType::mangle() const
 	return msg;
 }
 
-qneu_ArrayType * qneu_ArrayType::get( qneu_Type * basetype, qValue * size )
+qneu_ArrayType * qneu_ArrayType::get( dt_BaseType * basetype, qValue * size )
 {
 	int s = dynamic_cast<qConstant*>(size)->ivalue.x;
 
@@ -186,12 +186,12 @@ qneu_ArrayType * qneu_ArrayType::get( qneu_Type * basetype, qValue * size )
 	return basetype->arraytypes[s];
 }
 
-qneu_Type * qneu_Type::CreateArray(qValue * size)
+dt_BaseType * dt_BaseType::CreateArray(qValue * size)
 {
 	return qneu_ArrayType::get(this, size);
 }
 
-qneu_Type * qneu_ArrayType::updateWithType( const qString & newname,qneu_Type * s )
+dt_BaseType * qneu_ArrayType::updateWithType( const qString & newname,dt_BaseType * s )
 {
 	return base->updateWithType(newname,s)->CreateArray(new qConstant(TYPE_INT32, size));
 }

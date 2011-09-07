@@ -3,7 +3,7 @@
 
 std::map<qString, qneu_StructType*> structs;
 
-qneu_Type * TryAddStruct(qString & name)
+dt_BaseType * TryAddStruct(qString & name)
 {
 	if (structs.count(name))
 	{
@@ -19,16 +19,16 @@ void ResetStruct()
 
 static qValue * caller = 0;
 
-void qValue::updateNewType(const qString & namexxx, qneu_Type * s ) 
+void qValue::updateNewType(const qString & namexxx, dt_BaseType * s ) 
 {
 	if (neu_type)
 	{
-		qneu_Type * oldtype = neu_type;
+		dt_BaseType * oldtype = neu_type;
 		neu_type = neu_type->updateWithType(namexxx, s);
 	}
 }
 
-void notifyNewType(qString name, qneu_Type * s, qValue * tree ) 
+void notifyNewType(qString name, dt_BaseType * s, qValue * tree ) 
 {
 	tree->updateNewType(name, s);
 	for (int i = 0; i < tree->size(); i++)
@@ -37,7 +37,7 @@ void notifyNewType(qString name, qneu_Type * s, qValue * tree )
 	}
 }
 
-void notifyNewType2(qString name, qneu_Type * s, qValue * tree ) 
+void notifyNewType2(qString name, dt_BaseType * s, qValue * tree ) 
 {
 	for (std::map<qString, qneu_StructType*>::iterator it = structs.begin(), end = structs.end(); it != end; it++)
 	{

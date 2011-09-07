@@ -1,6 +1,6 @@
 #pragma once
 
-class qneu_VarargType : public qneu_Type
+class DABCORE_API qneu_VarargType : public dt_BaseType
 {
 public:
 	virtual qString name() const { return "vararg"; }

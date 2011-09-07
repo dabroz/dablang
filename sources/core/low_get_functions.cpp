@@ -63,8 +63,8 @@ void qFuncall::subupdateType()
 
 		for (int k = 0; k < maxq; k++)//ns.size(); k++)
 		{
-			qneu_Type * atype = (*seq)[k]->neu_type ;
-			qneu_Type * goodtype = f->args[k].type;
+			dt_BaseType * atype = (*seq)[k]->neu_type ;
+			dt_BaseType * goodtype = f->args[k].type;
 
 			if (atype == 0) 
 			{

@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dab-core", "dab-core.vcproj", "{BC927B63-816D-47B8-9B02-A574C7546AEB}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dab-ide", "dab-ide.vcproj", "{42DDCEF1-706B-49B4-BF7C-494C9A50B076}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -13,6 +15,10 @@ Global
 		{BC927B63-816D-47B8-9B02-A574C7546AEB}.Debug|Win32.Build.0 = Debug|Win32
 		{BC927B63-816D-47B8-9B02-A574C7546AEB}.Release|Win32.ActiveCfg = Release|Win32
 		{BC927B63-816D-47B8-9B02-A574C7546AEB}.Release|Win32.Build.0 = Release|Win32
+		{42DDCEF1-706B-49B4-BF7C-494C9A50B076}.Debug|Win32.ActiveCfg = Debug|Win32
+		{42DDCEF1-706B-49B4-BF7C-494C9A50B076}.Debug|Win32.Build.0 = Debug|Win32
+		{42DDCEF1-706B-49B4-BF7C-494C9A50B076}.Release|Win32.ActiveCfg = Release|Win32
+		{42DDCEF1-706B-49B4-BF7C-494C9A50B076}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

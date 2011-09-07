@@ -1,15 +1,15 @@
 #pragma once
 
-struct StructMember
+struct DABCORE_API StructMember
 {
-	qneu_Type * type;
+	dt_BaseType * type;
 	qString name;
 
 	int offset;
 	int size;
 };
 
-class qneu_StructType : public qneu_Type
+class DABCORE_API qneu_StructType : public dt_BaseType
 {
 public:
 	qneu_StructType * constver;
@@ -18,7 +18,7 @@ public:
 	qString stname;
 	llvm::Type * cachetype;
 
-	qneu_Type * GetTypeFor(qString membname) ;
+	dt_BaseType * GetTypeFor(qString membname) ;
 	qneu_StructType() : cachetype(0) {}
 
 	virtual qString name() const { return stname; }
@@ -26,7 +26,7 @@ public:
 	bool isPrimitive() { return false; }
 	virtual bool isStruct() const { return true; }
 
-	virtual qneu_Type * CreateConst() { return constver; }
+	virtual dt_BaseType * CreateConst() { return constver; }
 
 	virtual llvm::Type * llvm();
 	virtual Value * getLllvVariable( qString name, Value * parent ) ;

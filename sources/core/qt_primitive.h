@@ -2,10 +2,10 @@
 
 #define PRIMTYPE static qneu_PrimitiveType * ret = new qneu_PrimitiveType
 
-class qneu_PrimitiveType : public qneu_Type
+class DABCORE_API qneu_PrimitiveType : public dt_BaseType
 {
 public:
-	qneu_Type * constversion;
+	dt_BaseType * constversion;
 
 	int ptype;
 	qString pname;
@@ -16,7 +16,7 @@ public:
 
 	static qneu_PrimitiveType * type_int()    { return type_int32(); }
 
-	virtual qneu_Type * CreateConst() { return constversion; }
+	virtual dt_BaseType * CreateConst() { return constversion; }
 
 	static qneu_PrimitiveType * consttype_double()  { PRIMTYPE(TYPE_DOUBLE,	"const_double", "Cl"); return ret; }
 	static qneu_PrimitiveType * consttype_float()   { PRIMTYPE(TYPE_FLOAT,	"const_float", "Cf"); return ret; }
@@ -86,11 +86,11 @@ public:
 		}
 	}
 
-	virtual bool can_cast_to(qneu_Type * other) const;
+	virtual bool can_cast_to(dt_BaseType * other) const;
 
 	virtual llvm::Type * llvm();
 private:
-	qneu_PrimitiveType(int type, const char * xname, const char * xmangle, qneu_Type * constrv = 0)
+	qneu_PrimitiveType(int type, const char * xname, const char * xmangle, dt_BaseType * constrv = 0)
 	{
 		ptype = type; pname = xname; pmangle = xmangle; constversion = constrv;
 		if (!constrv) is_const = true;

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "dab_header.h"
 
-qneu_Type * tryret(qValue * binop, qneu_Type *v,qneu_Type * tt,const qString & c, const char * dat[], int count, qneu_Type * uptype = 0)
+dt_BaseType * tryret(qValue * binop, dt_BaseType *v,dt_BaseType * tt,const qString & c, const char * dat[], int count, dt_BaseType * uptype = 0)
 {
 	if (v) return v;
 	qString xname = binop->name;
@@ -34,7 +34,7 @@ qneu_Type * tryret(qValue * binop, qneu_Type *v,qneu_Type * tt,const qString & c
 
 typedef qneu_PrimitiveType qpe;
 
-qneu_Type * upgradebinop(qValue * binop, int LR, qneu_Type * T)
+dt_BaseType * upgradebinop(qValue * binop, int LR, dt_BaseType * T)
 {
 	char msg[9999];
 	sprintf(msg,"Argument %d of `%s`: ", LR+1, binop->name.c_str());
@@ -43,13 +43,13 @@ qneu_Type * upgradebinop(qValue * binop, int LR, qneu_Type * T)
 	return T;
 }
 
-qneu_Type * boolupgradebinop(qValue * binop, int LR, qneu_Type * T)
+dt_BaseType * boolupgradebinop(qValue * binop, int LR, dt_BaseType * T)
 {
 	upgradebinop(binop,LR,T);
 	return qpe::type_bool();
 }
 
-qneu_Type * type_for_binop(qValue * binop, const qString & c, const qString & name, qneu_PrimitiveType * L, qneu_PrimitiveType * R)
+dt_BaseType * type_for_binop(qValue * binop, const qString & c, const qString & name, qneu_PrimitiveType * L, qneu_PrimitiveType * R)
 {
 	if (name == "add" || name == "sub" || name == "mul" || name == "div" || name == "or" || name == "and" || name == "min" || name == "max")
 	{
@@ -104,8 +104,8 @@ void qBinOp::subupdateType()
 {
 	neu_type = 0;
 
-	qneu_Type * LT1 = L()->neu_type;
-	qneu_Type * RT1 = R()->neu_type;
+	dt_BaseType * LT1 = L()->neu_type;
+	dt_BaseType * RT1 = R()->neu_type;
 
 	qneu_PrimitiveType * LT = dynamic_cast<qneu_PrimitiveType*>(LT1);
 	qneu_PrimitiveType * RT = dynamic_cast<qneu_PrimitiveType*>(RT1);
@@ -140,8 +140,8 @@ llvm::Value * qBinOp::BuildValue()
  
 	qString codename = name+"_"+L()->neu_type->mangle() + R()->neu_type->mangle();
 
-	qneu_Type * LT1 = L()->neu_type;
-	qneu_Type * RT1 = R()->neu_type;
+	dt_BaseType * LT1 = L()->neu_type;
+	dt_BaseType * RT1 = R()->neu_type;
 
 	qneu_PrimitiveType * LT = dynamic_cast<qneu_PrimitiveType*>(LT1);
 	qneu_PrimitiveType * RT = dynamic_cast<qneu_PrimitiveType*>(RT1);
