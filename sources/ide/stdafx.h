@@ -7,6 +7,7 @@
 #include <wx/notebook.h>
 #include <wx/fontutil.h>
 #include <wx/stc/stc.h>
+#include <wx/mstream.h>
 
 #include <typeinfo>
 #include <iostream>

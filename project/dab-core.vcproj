@@ -183,10 +183,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\sources\core\resource.h"
-				>
-			</File>
-			<File
 				RelativePath="..\sources\core\stdafx.cpp"
 				>
 				<FileConfiguration

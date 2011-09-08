@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "resource.h"
 
 //#define WXUSINGDLL
 #define wxUSE_EXTENDED_RTTI 1
@@ -215,6 +216,47 @@ std::vector<qError> compileErrors;
 
 extern std::map<qString, std::vector<qneu_Function *>> functions;
 std::map<qString, std::vector<qneu_Function *>> functions;
+
+wxBitmap* GetBitmapFromMemory(const char* t_data, const DWORD t_size, int type = wxBITMAP_TYPE_PNG)
+{
+	wxMemoryInputStream a_is(t_data, t_size);
+	return new wxBitmap(wxImage(a_is, type, -1), -1);
+}
+
+bool LoadDataFromResource(char*& t_data, DWORD& t_dataSize, int resID, LPWSTR resType = RT_RCDATA)
+{
+	bool     r_result    = false;
+	HGLOBAL  a_resHandle = 0;
+	HRSRC    a_resource;
+
+	a_resource = FindResource(0, MAKEINTRESOURCE(resID), resType);
+
+	if (0 != a_resource)
+	{
+		a_resHandle = LoadResource(NULL, a_resource);
+		if (0 != a_resHandle)
+		{
+			t_data = (char*)LockResource(a_resHandle);
+			t_dataSize = SizeofResource(NULL, a_resource);
+			r_result = true;
+		}
+	}
+
+	return r_result;
+}
+
+wxBitmap* CreateBitmapFromPngResource(int resID)
+{
+	char*       a_data      = 0;
+	DWORD       a_dataSize  = 0;
+
+	if (LoadDataFromResource(a_data, a_dataSize, resID))
+	{
+		return GetBitmapFromMemory(a_data, a_dataSize);
+	}
+
+	return 0;
+}
 
 class MyFrame : public wxFrame
 {
@@ -577,11 +619,12 @@ public:
 		}
 	}
 
-	void AddToolbarItem(int id, const char * name, const char * img)
-	{
-		wxBitmap bmp = wxBitmap(std::string("img\\") + img, wxBITMAP_TYPE_PNG);
-		toolBar->AddTool(id, bmp, wxNullBitmap, false, _toolbar_currentX, -1, (wxObject *) NULL, name);
+	void AddToolbarItem(int id, const char * name, int imgID)
+	{		
+		wxBitmap * bmp = CreateBitmapFromPngResource(imgID);
+		toolBar->AddTool(id, bmp?*bmp:wxNullBitmap, wxNullBitmap, false, _toolbar_currentX, -1, (wxObject *) NULL, name);
 		_toolbar_currentX += 16 + 5;
+		delete bmp;
 	}
 
 	MyFrame() : wxFrame (NULL, -1, wxT("Dablang IDE"), wxPoint(300,100), wxSize(1100,700))
@@ -610,21 +653,21 @@ public:
 		wxInitAllImageHandlers();
 
 		_toolbar_currentX = 5;
-		AddToolbarItem(wxID_NEW, "New file", "DocumentHS.png");
-		AddToolbarItem(wxID_OPEN, "Open file", "openHS.png");
-		AddToolbarItem(wxID_SAVE, "Save file", "saveHS.png");
+		AddToolbarItem(wxID_NEW,		"New file",			IDX_NEW);
+		AddToolbarItem(wxID_OPEN,		"Open file",		IDX_OPEN);
+		AddToolbarItem(wxID_SAVE,		"Save file",		IDX_SAVE);
 		toolBar->AddSeparator();
-		AddToolbarItem(wxID_CUT, "Cut", "CutHS.png");
-		AddToolbarItem(wxID_COPY, "Copy", "CopyHS.png");
-		AddToolbarItem(wxID_PASTE, "Paste", "PasteHS.png");
+		AddToolbarItem(wxID_CUT,		"Cut",				IDX_CUT);
+		AddToolbarItem(wxID_COPY,		"Copy",				IDX_COPY);
+		AddToolbarItem(wxID_PASTE,		"Paste",			IDX_PASTE);
 		toolBar->AddSeparator();
-		AddToolbarItem(ID_DEFS, "Fix definitions", "defs.png");
+		AddToolbarItem(ID_DEFS,			"Fix definitions",	IDX_DEFS);
 		toolBar->AddSeparator();
-		AddToolbarItem(ID_COMPILE, "Compile", "Compile.png");
-		AddToolbarItem(ID_RUN, "Run", "PlayHS.png");
-		AddToolbarItem(ID_RUNINTERNAL, "Run internally", "play2.png");
-		AddToolbarItem(ID_PAUSE, "Pause", "PauseHS.png");
-		AddToolbarItem(ID_STOP, "Stop", "StopHS.png");
+		AddToolbarItem(ID_COMPILE,		"Compile",			IDX_COMPILE);
+		AddToolbarItem(ID_RUN,			"Run",				IDX_PLAY);
+		AddToolbarItem(ID_RUNINTERNAL,	"Run internally",	IDX_PLAY_INTERNAL);
+		AddToolbarItem(ID_PAUSE,		"Pause",			IDX_PAUSE);
+		AddToolbarItem(ID_STOP,			"Stop",				IDX_STOP);
 
 		toolBar->Realize();
 
@@ -651,8 +694,12 @@ public:
 		_errors->InsertColumn(5, "Column");
 
 		wxImageList * il = new wxImageList(16, 16);
-		il->Add(wxBitmap("img\\eventlogError.ico",  wxBITMAP_TYPE_ICO));
-		il->Add(wxBitmap("img\\eventlogWarn.ico",  wxBITMAP_TYPE_ICO));
+		wxBitmap * b1 = CreateBitmapFromPngResource(IDX_IC_ERROR);
+		wxBitmap * b2 = CreateBitmapFromPngResource(IDX_IC_WARNING);
+		il->Add(*b1);
+		il->Add(*b2);
+		delete b1;
+		delete b2;
 		_errors->AssignImageList(il, wxIMAGE_LIST_SMALL); 
 
 		_errors->SetColumnWidth(0, 25);
