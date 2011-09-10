@@ -200,3 +200,13 @@ llvm::Value * dt_BaseType::getLllvVariable( qString name, Value * parent )
 {
 	return 0;
 }
+
+dt_BaseType * dt_BaseType ::createPointer()
+{
+	return qneu_PointerType::get(this, false);
+}
+
+dt_BaseType * dt_BaseType ::createConstPointer()
+{
+	return qneu_PointerType::get(this, true);
+}

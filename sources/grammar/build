@@ -1,3 +1,4 @@
+export LANG=C
 rm *.cpp
 rm *.h
 flex -L dab.l

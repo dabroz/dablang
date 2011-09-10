@@ -1,24 +1,6 @@
 #include "stdafx.h"
 #include "dab_header.h"
 
-std::map<qString, qneu_StructType*> structs;
-
-dt_BaseType * TryAddStruct(qString & name)
-{
-	if (structs.count(name))
-	{
-		return structs[name];
-	}
-	return 0;
-}
-
-void ResetStruct()
-{
-	structs.clear();
-}
-
-static qValue * caller = 0;
-
 void qValue::updateNewType(const qString & namexxx, dt_BaseType * s ) 
 {
 	if (neu_type)
@@ -28,7 +10,7 @@ void qValue::updateNewType(const qString & namexxx, dt_BaseType * s )
 	}
 }
 
-void notifyNewType(qString name, dt_BaseType * s, qValue * tree ) 
+void notifyNewType(const qString & name, dt_BaseType * s, qValue * tree ) 
 {
 	tree->updateNewType(name, s);
 	for (int i = 0; i < tree->size(); i++)
@@ -37,6 +19,59 @@ void notifyNewType(qString name, dt_BaseType * s, qValue * tree )
 	}
 }
 
+void notifyStruct(const qString & name, dt_BaseType * s, qneu_StructType * st ) 
+{
+}
+
+void di_NotifyAboutType(const std::string & name, dt_BaseType * type, dab_Module * module)
+{
+	for (std::map<std::string, dab_Function>::iterator it = module->_functions.begin(), end = module->_functions.end(); it != end; ++it)
+	{
+		qFunction * f = it->second.node;
+		notifyNewType(name, type, f);
+	}
+	for (std::map<std::string, dab_Struct>::iterator it = module->_structs.begin(), end = module->_structs.end(); it != end; ++it)
+	{
+		notifyStruct(name, type, it->second.type);
+		notifyStruct(name, type, it->second.type->constver);
+	}
+}
+
+qneu_StructType * di_CreateStruct(qStruct * str, dab_Module * module)
+{
+	qneu_StructType * s = new qneu_StructType();
+
+	for (int i = 0, e = str->L()->size(); i < e; i++)
+	{
+		qMember * memb = dynamic_cast<qMember*>((*str->L())[i]);	
+		StructMember sm;
+		sm.type = memb->neu_type;
+
+		sm.name = memb->name;
+
+		s->members.push_back(sm);
+	}
+
+	s->stname = str->name;
+
+	/*if (structs.count(s->stname))
+	{
+		char msg[9999];
+		sprintf(msg, "Struct `%s` already exists.", s->stname.c_str());
+		str->fireError(true, ERROR_STRUCT_EXISTS, msg);
+		return;
+	}*/
+
+	s->constver = new qneu_StructType();
+	s->constver->constver = s->constver;
+	s->constver->is_const = true;
+	s->constver->members = s->members;
+	s->constver->stname = s->stname;
+
+	return s;
+}
+
+/*
 void notifyNewType2(qString name, dt_BaseType * s, qValue * tree ) 
 {
 	for (std::map<qString, qneu_StructType*>::iterator it = structs.begin(), end = structs.end(); it != end; it++)
@@ -61,74 +96,4 @@ void notifyNewType2(qString name, dt_BaseType * s, qValue * tree )
 		}
 	}
 }
-
-void add_struct( qStruct * str ) 
-{
-	qneu_StructType * s = new qneu_StructType();
-
-	for (int i = 0, e = str->L()->size(); i < e; i++)
-	{
-		qMember * memb = dynamic_cast<qMember*>((*str->L())[i]);	
-		StructMember sm;
-		sm.type = memb->neu_type;
-
-		sm.name = memb->name;
-
-		s->members.push_back(sm);
-	}
-
-	s->stname = str->name;
-
-	if (structs.count(s->stname))
-	{
-		char msg[9999];
-		sprintf(msg, "Struct `%s` already exists.", s->stname.c_str());
-		str->fireError(true, ERROR_STRUCT_EXISTS, msg);
-		return;
-	}
-
-	structs[s->stname] = s;
-
-	s->constver = new qneu_StructType();
-	s->constver->constver = s->constver;
-	s->constver->is_const = true;
-	s->constver->members = s->members;
-	s->constver->stname = s->stname;
-
-	notifyNewType(s->stname, s, caller);
-	notifyNewType2(s->stname, s, caller);
-	notifyNewType(s->stname, s->constver, caller);
-	notifyNewType2(s->stname, s->constver, caller);
-}
-
-void add_typedef( qTypedef * typedf ) 
-{
-	notifyNewType(typedf->name, typedf->neu_type, caller);
-	notifyNewType2(typedf->name, typedf->neu_type, caller);
-}
-
-void get_structs1(qValue * tree)
-{
-	qStruct * str = dynamic_cast<qStruct*>(tree);
-	if (str)
-	{
-		add_struct(str);
-		return;
-	}
-	qTypedef * typedf = dynamic_cast<qTypedef*>(tree);
-	if (typedf)
-	{
-		add_typedef(typedf);
-		return;
-	}
-	for (int i = 0; i < tree->size(); i++)
-	{
-		get_structs1((*tree)[i]);
-	}
-}
-
-void low_GetStructs(qValue * tree)
-{
-	caller = tree;
-	get_structs1(tree);
-}
+*/

@@ -156,5 +156,5 @@ void qValue::fireError( bool error, int num, const qString & desc )
 	err.line = loc.cmp_line;
 	err.start = loc.cmp_col;
 	err.desc = desc;
-	compileErrors.push_back(err);
+	//TODO! compileErrors.push_back(err);
 }

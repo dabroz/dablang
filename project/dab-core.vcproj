@@ -258,6 +258,10 @@
 				RelativePath="..\sources\core\qcode.cpp"
 				>
 			</File>
+			<File
+				RelativePath="..\sources\core\qv_builders.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Nodes"
@@ -292,10 +296,6 @@
 			</File>
 			<File
 				RelativePath="..\sources\core\qv_break.h"
-				>
-			</File>
-			<File
-				RelativePath="..\sources\core\qv_builders.cpp"
 				>
 			</File>
 			<File
@@ -356,6 +356,14 @@
 			</File>
 			<File
 				RelativePath="..\sources\core\qv_function.h"
+				>
+			</File>
+			<File
+				RelativePath="..\sources\core\qv_globalvar.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\sources\core\qv_globalvar.h"
 				>
 			</File>
 			<File

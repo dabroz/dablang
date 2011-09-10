@@ -80,19 +80,25 @@ int isatty(int foo) { return -1; }
 
 size_t q_yy_pos(void*scanner);
 
-void parse(char *buf, qValue **result)
+void dab_Parse(char *buf, qValue **result, const std::string & filename, std::vector<qError> & errors, dab_Module * module)
 {
     parse_parm  pp;
 
     pp.buf = buf;
     pp.length = strlen(buf);
     pp.pos = 0;
+    pp.filename = filename;
+    pp.errorsfound = 0;
+    pp.module = module;
+    
     *result = 0;
     yylex_init(&pp.yyscanner);
     yyset_extra(&pp, pp.yyscanner);
     yyparse(&pp, pp.yyscanner);
     *result = pp.result;
     yylex_destroy(pp.yyscanner);
+    
+    errors = pp.errors;
 }
 
 
@@ -393,7 +399,7 @@ union yyalloc
 /* YYNNTS -- Number of nonterminals.  */
 #define YYNNTS  19
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  85
+#define YYNRULES  86
 /* YYNRULES -- Number of states.  */
 #define YYNSTATES  187
 
@@ -444,66 +450,66 @@ static const yytype_uint8 yytranslate[] =
    YYRHS.  */
 static const yytype_uint16 yyprhs[] =
 {
-       0,     0,     3,     5,     8,    11,    13,    15,    19,    25,
-      34,    41,    48,    53,    57,    58,    62,    64,    69,    73,
-      75,    76,    81,    85,    88,    93,    97,   100,   102,   108,
-     116,   122,   132,   135,   139,   142,   146,   149,   152,   155,
-     157,   159,   162,   167,   171,   175,   179,   183,   187,   190,
-     193,   197,   201,   205,   209,   213,   217,   221,   225,   229,
-     233,   237,   241,   244,   247,   251,   253,   255,   257,   263,
-     265,   267,   269,   271,   275,   277,   279,   282,   285,   290,
-     294,   298,   300,   303,   306,   310
+       0,     0,     3,     5,     6,     9,    12,    14,    16,    20,
+      26,    35,    42,    49,    54,    58,    59,    63,    65,    70,
+      74,    76,    77,    82,    86,    89,    94,    98,   101,   103,
+     109,   117,   123,   133,   136,   140,   143,   147,   150,   153,
+     156,   158,   160,   163,   168,   172,   176,   180,   184,   188,
+     191,   194,   198,   202,   206,   210,   214,   218,   222,   226,
+     230,   234,   238,   242,   245,   248,   252,   254,   256,   258,
+     264,   266,   268,   270,   272,   276,   278,   280,   283,   286,
+     291,   295,   299,   301,   304,   307,   311
 };
 
 /* YYRHS -- A `-1'-separated list of the rules' RHS.  */
 static const yytype_int8 yyrhs[] =
 {
-      56,     0,    -1,    57,    -1,    57,    58,    -1,    57,     1,
-      -1,    58,    -1,     1,    -1,    72,     6,    48,    -1,    72,
-       6,    49,    70,    48,    -1,    13,    59,    72,     6,    50,
-      62,    51,    48,    -1,    72,     6,    50,    62,    51,    66,
-      -1,    12,     6,    52,    61,    53,    48,    -1,    17,    72,
-       6,    48,    -1,    50,    60,    51,    -1,    -1,    60,    54,
-      14,    -1,    14,    -1,    61,    72,     6,    48,    -1,    72,
-       6,    48,    -1,    63,    -1,    -1,    63,    54,    72,     6,
-      -1,    63,    54,    15,    -1,    72,     6,    -1,     6,    50,
-      71,    51,    -1,     6,    50,    51,    -1,    68,    48,    -1,
-      66,    -1,     8,    50,    69,    51,    65,    -1,     8,    50,
-      69,    51,    65,     9,    65,    -1,    10,    50,    69,    51,
-      65,    -1,    11,    50,    68,    48,    69,    48,    68,    51,
-      65,    -1,    64,    48,    -1,     7,    69,    48,    -1,    16,
-      48,    -1,    52,    67,    53,    -1,    52,    53,    -1,    67,
-      65,    -1,    67,     1,    -1,    65,    -1,     1,    -1,    72,
-       6,    -1,    72,     6,    49,    69,    -1,    73,    49,    69,
-      -1,    73,    25,    69,    -1,    73,    24,    69,    -1,    73,
-      23,    69,    -1,    73,    22,    69,    -1,    73,    21,    -1,
-      73,    20,    -1,    69,    29,    69,    -1,    69,    28,    69,
-      -1,    69,    31,    69,    -1,    69,    30,    69,    -1,    69,
-      26,    69,    -1,    69,    27,    69,    -1,    69,    32,    69,
-      -1,    69,    33,    69,    -1,    69,    35,    69,    -1,    69,
-      34,    69,    -1,    69,    36,    69,    -1,    69,    37,    69,
-      -1,    34,    69,    -1,    38,    69,    -1,    50,    69,    51,
-      -1,    70,    -1,    73,    -1,    64,    -1,    19,    30,    72,
-      31,    69,    -1,     3,    -1,     4,    -1,    14,    -1,     5,
-      -1,    71,    54,    69,    -1,    69,    -1,     6,    -1,    72,
-      36,    -1,    18,    72,    -1,    72,    30,     3,    31,    -1,
-      73,    47,     6,    -1,    73,    46,     6,    -1,     6,    -1,
-      32,    73,    -1,    36,    73,    -1,    50,    73,    51,    -1,
-      73,    44,    69,    45,    -1
+      56,     0,    -1,    57,    -1,    -1,    57,    58,    -1,    57,
+       1,    -1,    58,    -1,     1,    -1,    72,     6,    48,    -1,
+      72,     6,    49,    70,    48,    -1,    13,    59,    72,     6,
+      50,    62,    51,    48,    -1,    72,     6,    50,    62,    51,
+      66,    -1,    12,     6,    52,    61,    53,    48,    -1,    17,
+      72,     6,    48,    -1,    50,    60,    51,    -1,    -1,    60,
+      54,    14,    -1,    14,    -1,    61,    72,     6,    48,    -1,
+      72,     6,    48,    -1,    63,    -1,    -1,    63,    54,    72,
+       6,    -1,    63,    54,    15,    -1,    72,     6,    -1,     6,
+      50,    71,    51,    -1,     6,    50,    51,    -1,    68,    48,
+      -1,    66,    -1,     8,    50,    69,    51,    65,    -1,     8,
+      50,    69,    51,    65,     9,    65,    -1,    10,    50,    69,
+      51,    65,    -1,    11,    50,    68,    48,    69,    48,    68,
+      51,    65,    -1,    64,    48,    -1,     7,    69,    48,    -1,
+      16,    48,    -1,    52,    67,    53,    -1,    52,    53,    -1,
+      67,    65,    -1,    67,     1,    -1,    65,    -1,     1,    -1,
+      72,     6,    -1,    72,     6,    49,    69,    -1,    73,    49,
+      69,    -1,    73,    25,    69,    -1,    73,    24,    69,    -1,
+      73,    23,    69,    -1,    73,    22,    69,    -1,    73,    21,
+      -1,    73,    20,    -1,    69,    29,    69,    -1,    69,    28,
+      69,    -1,    69,    31,    69,    -1,    69,    30,    69,    -1,
+      69,    26,    69,    -1,    69,    27,    69,    -1,    69,    32,
+      69,    -1,    69,    33,    69,    -1,    69,    35,    69,    -1,
+      69,    34,    69,    -1,    69,    36,    69,    -1,    69,    37,
+      69,    -1,    34,    69,    -1,    38,    69,    -1,    50,    69,
+      51,    -1,    70,    -1,    73,    -1,    64,    -1,    19,    30,
+      72,    31,    69,    -1,     3,    -1,     4,    -1,    14,    -1,
+       5,    -1,    71,    54,    69,    -1,    69,    -1,     6,    -1,
+      72,    36,    -1,    18,    72,    -1,    72,    30,     3,    31,
+      -1,    73,    47,     6,    -1,    73,    46,     6,    -1,     6,
+      -1,    32,    73,    -1,    36,    73,    -1,    50,    73,    51,
+      -1,    73,    44,    69,    45,    -1
 };
 
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    61,    61,    65,    66,    67,    68,    72,    73,    74,
-      75,    76,    77,    81,    82,    86,    87,    91,    92,    95,
-      95,    98,    99,   100,   104,   105,   109,   110,   111,   112,
-     113,   114,   115,   116,   117,   121,   122,   126,   127,   128,
-     129,   133,   134,   135,   136,   137,   138,   139,   140,   141,
-     145,   146,   147,   148,   149,   150,   151,   152,   153,   154,
-     155,   156,   157,   158,   159,   160,   161,   162,   163,   167,
-     168,   169,   170,   174,   175,   179,   180,   181,   182,   186,
-     187,   188,   189,   190,   191,   192
+       0,    67,    67,    68,    72,    73,    74,    75,    79,    80,
+      81,    82,    83,    84,    88,    89,    93,    94,    98,    99,
+     102,   102,   105,   106,   107,   111,   112,   116,   117,   118,
+     119,   120,   121,   122,   123,   124,   128,   129,   133,   134,
+     135,   136,   140,   141,   142,   143,   144,   145,   146,   147,
+     148,   152,   153,   154,   155,   156,   157,   158,   159,   160,
+     161,   162,   163,   164,   165,   166,   167,   168,   169,   170,
+     174,   175,   176,   177,   181,   182,   186,   187,   188,   189,
+     193,   194,   195,   196,   197,   198,   199
 };
 #endif
 
@@ -542,29 +548,29 @@ static const yytype_uint16 yytoknum[] =
 /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_uint8 yyr1[] =
 {
-       0,    55,    56,    57,    57,    57,    57,    58,    58,    58,
-      58,    58,    58,    59,    59,    60,    60,    61,    61,    62,
-      62,    63,    63,    63,    64,    64,    65,    65,    65,    65,
-      65,    65,    65,    65,    65,    66,    66,    67,    67,    67,
-      67,    68,    68,    68,    68,    68,    68,    68,    68,    68,
+       0,    55,    56,    56,    57,    57,    57,    57,    58,    58,
+      58,    58,    58,    58,    59,    59,    60,    60,    61,    61,
+      62,    62,    63,    63,    63,    64,    64,    65,    65,    65,
+      65,    65,    65,    65,    65,    65,    66,    66,    67,    67,
+      67,    67,    68,    68,    68,    68,    68,    68,    68,    68,
+      68,    69,    69,    69,    69,    69,    69,    69,    69,    69,
       69,    69,    69,    69,    69,    69,    69,    69,    69,    69,
-      69,    69,    69,    69,    69,    69,    69,    69,    69,    70,
-      70,    70,    70,    71,    71,    72,    72,    72,    72,    73,
-      73,    73,    73,    73,    73,    73
+      70,    70,    70,    70,    71,    71,    72,    72,    72,    72,
+      73,    73,    73,    73,    73,    73,    73
 };
 
 /* YYR2[YYN] -- Number of symbols composing right hand side of rule YYN.  */
 static const yytype_uint8 yyr2[] =
 {
-       0,     2,     1,     2,     2,     1,     1,     3,     5,     8,
-       6,     6,     4,     3,     0,     3,     1,     4,     3,     1,
-       0,     4,     3,     2,     4,     3,     2,     1,     5,     7,
-       5,     9,     2,     3,     2,     3,     2,     2,     2,     1,
-       1,     2,     4,     3,     3,     3,     3,     3,     2,     2,
-       3,     3,     3,     3,     3,     3,     3,     3,     3,     3,
-       3,     3,     2,     2,     3,     1,     1,     1,     5,     1,
-       1,     1,     1,     3,     1,     1,     2,     2,     4,     3,
-       3,     1,     2,     2,     3,     4
+       0,     2,     1,     0,     2,     2,     1,     1,     3,     5,
+       8,     6,     6,     4,     3,     0,     3,     1,     4,     3,
+       1,     0,     4,     3,     2,     4,     3,     2,     1,     5,
+       7,     5,     9,     2,     3,     2,     3,     2,     2,     2,
+       1,     1,     2,     4,     3,     3,     3,     3,     3,     2,
+       2,     3,     3,     3,     3,     3,     3,     3,     3,     3,
+       3,     3,     3,     2,     2,     3,     1,     1,     1,     5,
+       1,     1,     1,     1,     3,     1,     1,     2,     2,     4,
+       3,     3,     1,     2,     2,     3,     4
 };
 
 /* YYDEFACT[STATE-NAME] -- Default rule to reduce with in state
@@ -572,25 +578,25 @@ static const yytype_uint8 yyr2[] =
    means the default is an error.  */
 static const yytype_uint8 yydefact[] =
 {
-       0,     6,    75,     0,    14,     0,     0,     0,     0,     5,
-       0,     0,     0,     0,     0,    77,     1,     4,     3,     0,
-       0,    76,     0,    16,     0,     0,     0,     7,     0,    20,
-       0,     0,     0,    13,     0,     0,    12,    69,    70,    72,
-      71,     0,     0,    19,     0,    78,     0,     0,     0,    15,
-      20,     8,     0,     0,    23,    11,     0,    18,     0,     0,
-      10,    22,     0,    17,     0,    40,    81,     0,     0,     0,
-       0,     0,     0,     0,     0,    36,     0,    39,    27,     0,
-       0,     0,     0,    21,     9,     0,    81,     0,     0,     0,
-       0,    67,     0,    65,    66,     0,     0,     0,    34,    81,
-      82,    83,     0,    32,    38,    35,    37,    26,    41,    49,
-      48,     0,     0,     0,     0,     0,     0,     0,     0,    25,
-      74,     0,     0,    62,    63,     0,    66,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,    33,
-       0,     0,    81,     0,    84,     0,    47,    46,    45,    44,
-       0,    80,    79,    43,    24,     0,     0,    64,    54,    55,
-      51,    50,    53,    52,    56,    57,    59,    58,    60,    61,
-       0,     0,     0,    42,    85,    73,     0,    28,    30,     0,
-      68,     0,     0,    29,     0,     0,    31
+       0,     7,    76,     0,    15,     0,     0,     0,     0,     6,
+       0,     0,     0,     0,     0,    78,     1,     5,     4,     0,
+       0,    77,     0,    17,     0,     0,     0,     8,     0,    21,
+       0,     0,     0,    14,     0,     0,    13,    70,    71,    73,
+      72,     0,     0,    20,     0,    79,     0,     0,     0,    16,
+      21,     9,     0,     0,    24,    12,     0,    19,     0,     0,
+      11,    23,     0,    18,     0,    41,    82,     0,     0,     0,
+       0,     0,     0,     0,     0,    37,     0,    40,    28,     0,
+       0,     0,     0,    22,    10,     0,    82,     0,     0,     0,
+       0,    68,     0,    66,    67,     0,     0,     0,    35,    82,
+      83,    84,     0,    33,    39,    36,    38,    27,    42,    50,
+      49,     0,     0,     0,     0,     0,     0,     0,     0,    26,
+      75,     0,     0,    63,    64,     0,    67,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,    34,
+       0,     0,    82,     0,    85,     0,    48,    47,    46,    45,
+       0,    81,    80,    44,    25,     0,     0,    65,    55,    56,
+      52,    51,    54,    53,    57,    58,    60,    59,    61,    62,
+       0,     0,     0,    43,    86,    74,     0,    29,    31,     0,
+      69,     0,     0,    30,     0,     0,    32
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
@@ -605,7 +611,7 @@ static const yytype_int8 yydefgoto[] =
 #define YYPACT_NINF -94
 static const yytype_int16 yypact[] =
 {
-     381,   -94,   -94,     0,   -40,    -1,    -1,    18,   379,   -94,
+     379,   -94,   -94,     0,   -40,    -1,    -1,    18,   381,   -94,
       61,    -6,    44,    -1,    65,   -94,   -94,   -94,   -94,    50,
       74,   -94,    -1,   -94,   -28,   100,    16,   -94,    82,    -1,
       49,     1,   134,   -94,    69,    52,   -94,   -94,   -94,   -94,
@@ -637,7 +643,7 @@ static const yytype_int16 yypgoto[] =
    positive, shift that token.  If negative, reduce the rule which
    number is the opposite.  If zero, do what YYDEFACT says.
    If YYTABLE_NINF, syntax error.  */
-#define YYTABLE_NINF -76
+#define YYTABLE_NINF -77
 static const yytype_int16 yytable[] =
 {
       82,   106,    76,    10,   143,     2,    11,     2,    14,    15,
@@ -646,10 +652,10 @@ static const yytype_int16 yytable[] =
       65,   126,    44,    21,    47,    66,    67,    68,    82,    69,
       70,    37,    38,    39,    86,    71,    22,     6,   135,   136,
      137,   138,    40,    44,    46,    72,    62,    87,    23,    73,
-     -75,    72,   137,   138,    36,    73,   115,    19,   116,   117,
+     -76,    72,   137,   138,    36,    73,   115,    19,   116,   117,
       72,    26,    88,    74,    73,   154,    89,    30,   155,    74,
-      45,    59,    75,    49,   -75,    37,    38,    39,    90,   184,
-     -75,    20,   177,   178,    51,    20,    40,    21,    27,    28,
+      45,    59,    75,    49,   -76,    37,    38,    39,    90,   184,
+     -76,    20,   177,   178,    51,    20,    40,    21,    27,    28,
       29,    21,    50,   183,    85,   120,    35,   186,   123,   124,
      125,    82,    82,    76,    76,   140,   141,   134,   135,   136,
      137,   138,    82,    82,    76,   156,    82,    52,    76,    53,
@@ -661,10 +667,10 @@ static const yytype_int16 yytable[] =
      122,    85,   145,   151,   152,    20,   172,    37,    38,    39,
       86,    21,   179,    72,   181,   142,   180,    73,    40,    56,
       66,    67,    68,    87,    69,    70,    18,     6,    83,   185,
-      71,    74,     6,    59,   105,    58,    72,   108,    88,   -75,
+      71,    74,     6,    59,   105,    58,    72,   108,    88,   -76,
       73,    72,    89,    20,    60,    73,    72,    41,     0,    21,
       73,     0,    20,     0,    90,   119,     0,     0,    21,    74,
-       0,    20,     0,   -75,    74,     0,    59,    21,     0,   -75,
+       0,    20,     0,   -76,    74,     0,    59,    21,     0,   -76,
      109,   110,   111,   112,   113,   114,     0,   127,   128,   129,
      130,   131,   132,   133,   134,   135,   136,   137,   138,     0,
        0,     0,     0,     0,   115,     0,   116,   117,     0,   118,
@@ -677,8 +683,8 @@ static const yytype_int16 yytable[] =
      136,   137,   138,   139,   127,   128,   129,   130,   131,   132,
      133,   134,   135,   136,   137,   138,   131,   132,   133,   134,
      135,   136,   137,   138,     0,     0,   182,   127,   128,   129,
-     130,   131,   132,   133,   134,   135,   136,   137,   138,    -2,
-      17,     0,     1,     0,     0,     2,   174,     2,     0,     0,
+     130,   131,   132,   133,   134,   135,   136,   137,   138,    -3,
+       1,    -2,    17,     0,     0,     2,   174,     2,     0,     0,
        0,     3,     4,     3,     4,     0,     5,     6,     5,     6,
      127,   128,   129,   130,   131,   132,   133,   134,   135,   136,
      137,   138,   133,   134,   135,   136,   137,   138
@@ -724,7 +730,7 @@ static const yytype_int16 yycheck[] =
       32,    33,    34,    35,    36,    37,    30,    31,    32,    33,
       34,    35,    36,    37,    -1,    -1,    48,    26,    27,    28,
       29,    30,    31,    32,    33,    34,    35,    36,    37,     0,
-       1,    -1,     1,    -1,    -1,     6,    45,     6,    -1,    -1,
+       1,     0,     1,    -1,    -1,     6,    45,     6,    -1,    -1,
       -1,    12,    13,    12,    13,    -1,    17,    18,    17,    18,
       26,    27,    28,    29,    30,    31,    32,    33,    34,    35,
       36,    37,    32,    33,    34,    35,    36,    37
@@ -1591,360 +1597,365 @@ yyreduce:
 
   case 3:
 
-    { (yyval) = qtree_program_append((yyvsp[(1) - (2)]), (yyvsp[(2) - (2)])); ;}
+    { parm->result = qtree_program_start(0); ;}
     break;
 
   case 4:
 
-    { (yyval) = (yyvsp[(1) - (2)]); yyclearin; yyerrok; ;}
+    { (yyval) = qtree_program_append((yyvsp[(1) - (2)]), (yyvsp[(2) - (2)])); ;}
     break;
 
   case 5:
 
-    { (yyval) = qtree_program_start((yyvsp[(1) - (1)])); ;}
+    { (yyval) = (yyvsp[(1) - (2)]); yyclearin; yyerrok; ;}
     break;
 
   case 6:
 
-    { yyclearin; yyerrok; ;}
+    { (yyval) = qtree_program_start((yyvsp[(1) - (1)])); ;}
     break;
 
   case 7:
 
-    { (yyval) = qtree_declare((yyvsp[(1) - (3)]), (yyvsp[(2) - (3)])); ;}
+    { yyclearin; yyerrok; ;}
     break;
 
   case 8:
 
-    { (yyval) = qtree_declare_value((yyvsp[(1) - (5)]), (yyvsp[(2) - (5)]), (yyvsp[(4) - (5)])); ;}
+    { (yyval) = QCODEY((yyvsp[(2) - (3)]), qtree_globalvar((yyvsp[(1) - (3)]), (yyvsp[(2) - (3)]), 0)); ;}
     break;
 
   case 9:
 
-    { (yyval) = new qExternFunc((yyvsp[(2) - (8)]), (yyvsp[(3) - (8)]), (yyvsp[(4) - (8)]), (yyvsp[(6) - (8)])); ;}
+    { (yyval) = QCODEY((yyvsp[(2) - (5)]), qtree_globalvar((yyvsp[(1) - (5)]), (yyvsp[(2) - (5)]), (yyvsp[(4) - (5)]))); ;}
     break;
 
   case 10:
 
-    { (yyval) = QCODEY((yyvsp[(2) - (6)]), qtree_function((yyvsp[(1) - (6)]), (yyvsp[(2) - (6)]), (yyvsp[(4) - (6)]), (yyvsp[(6) - (6)]))); ;}
+    { (yyval) = QCODEY((yyvsp[(4) - (8)]), new qExternFunc((yyvsp[(2) - (8)]), (yyvsp[(3) - (8)]), (yyvsp[(4) - (8)]), (yyvsp[(6) - (8)]))); ;}
     break;
 
   case 11:
 
-    { (yyval) = QCODEY((yyvsp[(2) - (6)]), qtree_struct((yyvsp[(2) - (6)]), (yyvsp[(4) - (6)]))); ;}
+    { (yyval) = QCODEY((yyvsp[(2) - (6)]), qtree_function((yyvsp[(1) - (6)]), (yyvsp[(2) - (6)]), (yyvsp[(4) - (6)]), (yyvsp[(6) - (6)]))); ;}
     break;
 
   case 12:
 
-    { (yyval) = QCODEY((yyvsp[(3) - (4)]), new qTypedef((yyvsp[(3) - (4)]), (yyvsp[(2) - (4)]))); ;}
+    { (yyval) = QCODEY((yyvsp[(2) - (6)]), qtree_struct((yyvsp[(2) - (6)]), (yyvsp[(4) - (6)]))); ;}
     break;
 
   case 13:
 
-    { (yyval) = (yyvsp[(2) - (3)]); ;}
+    { (yyval) = QCODEY((yyvsp[(3) - (4)]), new qTypedef((yyvsp[(3) - (4)]), (yyvsp[(2) - (4)]))); ;}
     break;
 
   case 14:
 
-    { (yyval) = 0; ;}
+    { (yyval) = (yyvsp[(2) - (3)]); ;}
     break;
 
   case 15:
 
-    { (yyval) = qtree_seq_append((yyvsp[(1) - (3)]), (yyvsp[(3) - (3)])); ;}
+    { (yyval) = 0; ;}
     break;
 
   case 16:
 
-    { (yyval) = qtree_seq_start((yyvsp[(1) - (1)])); ;}
+    { (yyval) = qtree_seq_append((yyvsp[(1) - (3)]), (yyvsp[(3) - (3)])); ;}
     break;
 
   case 17:
 
-    { (yyval) = qtree_seq_append((yyvsp[(1) - (4)]), QCODEY((yyvsp[(3) - (4)]), qtree_smember((yyvsp[(2) - (4)]), (yyvsp[(3) - (4)])))); ;}
+    { (yyval) = qtree_seq_start((yyvsp[(1) - (1)])); ;}
     break;
 
   case 18:
 
-    { (yyval) = qtree_seq_start(qtree_smember((yyvsp[(1) - (3)]), (yyvsp[(2) - (3)]))); ;}
+    { (yyval) = qtree_seq_append((yyvsp[(1) - (4)]), QCODEY((yyvsp[(3) - (4)]), qtree_smember((yyvsp[(2) - (4)]), (yyvsp[(3) - (4)])))); ;}
     break;
 
-  case 20:
+  case 19:
 
-    { (yyval) = 0; ;}
+    { (yyval) = qtree_seq_start(qtree_smember((yyvsp[(1) - (3)]), (yyvsp[(2) - (3)]))); ;}
     break;
 
   case 21:
 
-    { (yyval) = qtree_seq_append((yyvsp[(1) - (4)]), qtree_declare((yyvsp[(3) - (4)]), (yyvsp[(4) - (4)]))); ;}
+    { (yyval) = 0; ;}
     break;
 
   case 22:
 
-    { (yyval) = qtree_seq_append((yyvsp[(1) - (3)]), qtree_vararg()); ;}
+    { (yyval) = qtree_seq_append((yyvsp[(1) - (4)]), qtree_declare((yyvsp[(3) - (4)]), (yyvsp[(4) - (4)]))); ;}
     break;
 
   case 23:
 
-    { (yyval) = qtree_seq_start(qtree_declare((yyvsp[(1) - (2)]), (yyvsp[(2) - (2)]))); ;}
+    { (yyval) = qtree_seq_append((yyvsp[(1) - (3)]), qtree_vararg()); ;}
     break;
 
   case 24:
 
-    { (yyval) = QCODEY((yyvsp[(1) - (4)]), qtree_funcall((yyvsp[(1) - (4)]), (yyvsp[(3) - (4)]))); ;}
+    { (yyval) = qtree_seq_start(qtree_declare((yyvsp[(1) - (2)]), (yyvsp[(2) - (2)]))); ;}
     break;
 
   case 25:
 
-    { (yyval) = QCODEY((yyvsp[(1) - (3)]), qtree_funcall((yyvsp[(1) - (3)]), 0)); ;}
+    { (yyval) = QCODEY((yyvsp[(1) - (4)]), qtree_funcall((yyvsp[(1) - (4)]), (yyvsp[(3) - (4)]))); ;}
     break;
 
-  case 28:
+  case 26:
 
-    { (yyval) = qtree_if((yyvsp[(3) - (5)]), (yyvsp[(5) - (5)]), 0); ;}
+    { (yyval) = QCODEY((yyvsp[(1) - (3)]), qtree_funcall((yyvsp[(1) - (3)]), 0)); ;}
     break;
 
   case 29:
 
-    { (yyval) = qtree_if((yyvsp[(3) - (7)]), (yyvsp[(5) - (7)]), (yyvsp[(7) - (7)])); ;}
+    { (yyval) = qtree_if((yyvsp[(3) - (5)]), (yyvsp[(5) - (5)]), 0); ;}
     break;
 
   case 30:
 
-    { (yyval) = qtree_while((yyvsp[(3) - (5)]), (yyvsp[(5) - (5)])); ;}
+    { (yyval) = qtree_if((yyvsp[(3) - (7)]), (yyvsp[(5) - (7)]), (yyvsp[(7) - (7)])); ;}
     break;
 
   case 31:
 
-    { (yyval) = qtree_for((yyvsp[(3) - (9)]), (yyvsp[(5) - (9)]), (yyvsp[(7) - (9)]), (yyvsp[(9) - (9)])); ;}
+    { (yyval) = qtree_while((yyvsp[(3) - (5)]), (yyvsp[(5) - (5)])); ;}
     break;
 
-  case 33:
+  case 32:
 
-    { (yyval) = qtree_return((yyvsp[(2) - (3)])); ;}
+    { (yyval) = qtree_for((yyvsp[(3) - (9)]), (yyvsp[(5) - (9)]), (yyvsp[(7) - (9)]), (yyvsp[(9) - (9)])); ;}
     break;
 
   case 34:
 
-    { (yyval) = QCODEX(new qBreak()); ;}
+    { (yyval) = qtree_return((yyvsp[(2) - (3)])); ;}
     break;
 
   case 35:
 
-    { (yyval) = qtree_block((yyvsp[(2) - (3)])); ;}
+    { (yyval) = QCODEX(new qBreak()); ;}
     break;
 
   case 36:
 
-    { (yyval) = 0; ;}
+    { (yyval) = qtree_block((yyvsp[(2) - (3)])); ;}
     break;
 
   case 37:
 
-    { (yyval) = qtree_seq_append((yyvsp[(1) - (2)]), (yyvsp[(2) - (2)])); ;}
+    { (yyval) = 0; ;}
     break;
 
   case 38:
 
-    { (yyval) = (yyvsp[(1) - (2)]); yyclearin; yyerrok; ;}
+    { (yyval) = qtree_seq_append((yyvsp[(1) - (2)]), (yyvsp[(2) - (2)])); ;}
     break;
 
   case 39:
 
-    { (yyval) = qtree_seq_start((yyvsp[(1) - (1)])); ;}
+    { (yyval) = (yyvsp[(1) - (2)]); yyclearin; yyerrok; ;}
     break;
 
   case 40:
 
-    { yyclearin; yyerrok; ;}
+    { (yyval) = qtree_seq_start((yyvsp[(1) - (1)])); ;}
     break;
 
   case 41:
 
-    { (yyval) = QCODEY((yyvsp[(1) - (2)]), qtree_declare((yyvsp[(1) - (2)]), (yyvsp[(2) - (2)]))); ;}
+    { yyclearin; yyerrok; ;}
     break;
 
   case 42:
 
-    { (yyval) = QCODEY((yyvsp[(1) - (4)]), qtree_declare_value((yyvsp[(1) - (4)]), (yyvsp[(2) - (4)]), (yyvsp[(4) - (4)]))); ;}
+    { (yyval) = QCODEY((yyvsp[(1) - (2)]), qtree_declare((yyvsp[(1) - (2)]), (yyvsp[(2) - (2)]))); ;}
     break;
 
   case 43:
 
-    { (yyval) = QCODEY((yyvsp[(1) - (3)]), qtree_assign((yyvsp[(1) - (3)]), (yyvsp[(3) - (3)]))); ;}
+    { (yyval) = QCODEY((yyvsp[(1) - (4)]), qtree_declare_value((yyvsp[(1) - (4)]), (yyvsp[(2) - (4)]), (yyvsp[(4) - (4)]))); ;}
     break;
 
   case 44:
 
-    { (yyval) = QCODEY((yyvsp[(1) - (3)]), qtree_assign((yyvsp[(1) - (3)]), qtree_binop("add", (yyvsp[(1) - (3)]), (yyvsp[(3) - (3)])))); ;}
+    { (yyval) = QCODEY((yyvsp[(1) - (3)]), qtree_assign((yyvsp[(1) - (3)]), (yyvsp[(3) - (3)]))); ;}
     break;
 
   case 45:
 
-    { (yyval) = QCODEY((yyvsp[(1) - (3)]), qtree_assign((yyvsp[(1) - (3)]), qtree_binop("sub", (yyvsp[(1) - (3)]), (yyvsp[(3) - (3)])))); ;}
+    { (yyval) = QCODEY((yyvsp[(1) - (3)]), qtree_assign((yyvsp[(1) - (3)]), qtree_binop("add", (yyvsp[(1) - (3)]), (yyvsp[(3) - (3)])))); ;}
     break;
 
   case 46:
 
-    { (yyval) = QCODEY((yyvsp[(1) - (3)]), qtree_assign((yyvsp[(1) - (3)]), qtree_binop("mul", (yyvsp[(1) - (3)]), (yyvsp[(3) - (3)])))); ;}
+    { (yyval) = QCODEY((yyvsp[(1) - (3)]), qtree_assign((yyvsp[(1) - (3)]), qtree_binop("sub", (yyvsp[(1) - (3)]), (yyvsp[(3) - (3)])))); ;}
     break;
 
   case 47:
 
-    { (yyval) = QCODEY((yyvsp[(1) - (3)]), qtree_assign((yyvsp[(1) - (3)]), qtree_binop("div", (yyvsp[(1) - (3)]), (yyvsp[(3) - (3)])))); ;}
+    { (yyval) = QCODEY((yyvsp[(1) - (3)]), qtree_assign((yyvsp[(1) - (3)]), qtree_binop("mul", (yyvsp[(1) - (3)]), (yyvsp[(3) - (3)])))); ;}
     break;
 
   case 48:
 
-    { (yyval) = QCODEY((yyvsp[(1) - (2)]), qtree_assign((yyvsp[(1) - (2)]), qtree_binop("add", (yyvsp[(1) - (2)]), qtree_constant_int(1)))); ;}
+    { (yyval) = QCODEY((yyvsp[(1) - (3)]), qtree_assign((yyvsp[(1) - (3)]), qtree_binop("div", (yyvsp[(1) - (3)]), (yyvsp[(3) - (3)])))); ;}
     break;
 
   case 49:
 
-    { (yyval) = QCODEY((yyvsp[(1) - (2)]), qtree_assign((yyvsp[(1) - (2)]), qtree_binop("sub", (yyvsp[(1) - (2)]), qtree_constant_int(1)))); ;}
+    { (yyval) = QCODEY((yyvsp[(1) - (2)]), qtree_assign((yyvsp[(1) - (2)]), qtree_binop("add", (yyvsp[(1) - (2)]), qtree_constant_int(1)))); ;}
     break;
 
   case 50:
 
-    { (yyval) = QCODEY((yyvsp[(1) - (3)]), qtree_binop("eq",   (yyvsp[(1) - (3)]), (yyvsp[(3) - (3)]))); ;}
+    { (yyval) = QCODEY((yyvsp[(1) - (2)]), qtree_assign((yyvsp[(1) - (2)]), qtree_binop("sub", (yyvsp[(1) - (2)]), qtree_constant_int(1)))); ;}
     break;
 
   case 51:
 
-    { (yyval) = QCODEY((yyvsp[(1) - (3)]), qtree_binop("neq",  (yyvsp[(1) - (3)]), (yyvsp[(3) - (3)]))); ;}
+    { (yyval) = QCODEY((yyvsp[(1) - (3)]), qtree_binop("eq",   (yyvsp[(1) - (3)]), (yyvsp[(3) - (3)]))); ;}
     break;
 
   case 52:
 
-    { (yyval) = QCODEY((yyvsp[(1) - (3)]), qtree_binop("gt",   (yyvsp[(1) - (3)]), (yyvsp[(3) - (3)]))); ;}
+    { (yyval) = QCODEY((yyvsp[(1) - (3)]), qtree_binop("neq",  (yyvsp[(1) - (3)]), (yyvsp[(3) - (3)]))); ;}
     break;
 
   case 53:
 
-    { (yyval) = QCODEY((yyvsp[(1) - (3)]), qtree_binop("lt",   (yyvsp[(1) - (3)]), (yyvsp[(3) - (3)]))); ;}
+    { (yyval) = QCODEY((yyvsp[(1) - (3)]), qtree_binop("gt",   (yyvsp[(1) - (3)]), (yyvsp[(3) - (3)]))); ;}
     break;
 
   case 54:
 
-    { (yyval) = QCODEY((yyvsp[(1) - (3)]), qtree_binop("band", (yyvsp[(1) - (3)]), (yyvsp[(3) - (3)]))); ;}
+    { (yyval) = QCODEY((yyvsp[(1) - (3)]), qtree_binop("lt",   (yyvsp[(1) - (3)]), (yyvsp[(3) - (3)]))); ;}
     break;
 
   case 55:
 
-    { (yyval) = QCODEY((yyvsp[(1) - (3)]), qtree_binop("bor",  (yyvsp[(1) - (3)]), (yyvsp[(3) - (3)]))); ;}
+    { (yyval) = QCODEY((yyvsp[(1) - (3)]), qtree_binop("band", (yyvsp[(1) - (3)]), (yyvsp[(3) - (3)]))); ;}
     break;
 
   case 56:
 
-    { (yyval) = QCODEY((yyvsp[(1) - (3)]), qtree_binop("and",  (yyvsp[(1) - (3)]), (yyvsp[(3) - (3)]))); ;}
+    { (yyval) = QCODEY((yyvsp[(1) - (3)]), qtree_binop("bor",  (yyvsp[(1) - (3)]), (yyvsp[(3) - (3)]))); ;}
     break;
 
   case 57:
 
-    { (yyval) = QCODEY((yyvsp[(1) - (3)]), qtree_binop("or",   (yyvsp[(1) - (3)]), (yyvsp[(3) - (3)]))); ;}
+    { (yyval) = QCODEY((yyvsp[(1) - (3)]), qtree_binop("and",  (yyvsp[(1) - (3)]), (yyvsp[(3) - (3)]))); ;}
     break;
 
   case 58:
 
-    { (yyval) = QCODEY((yyvsp[(1) - (3)]), qtree_binop("add",  (yyvsp[(1) - (3)]), (yyvsp[(3) - (3)]))); ;}
+    { (yyval) = QCODEY((yyvsp[(1) - (3)]), qtree_binop("or",   (yyvsp[(1) - (3)]), (yyvsp[(3) - (3)]))); ;}
     break;
 
   case 59:
 
-    { (yyval) = QCODEY((yyvsp[(1) - (3)]), qtree_binop("sub",  (yyvsp[(1) - (3)]), (yyvsp[(3) - (3)]))); ;}
+    { (yyval) = QCODEY((yyvsp[(1) - (3)]), qtree_binop("add",  (yyvsp[(1) - (3)]), (yyvsp[(3) - (3)]))); ;}
     break;
 
   case 60:
 
-    { (yyval) = QCODEY((yyvsp[(1) - (3)]), qtree_binop("mul",  (yyvsp[(1) - (3)]), (yyvsp[(3) - (3)]))); ;}
+    { (yyval) = QCODEY((yyvsp[(1) - (3)]), qtree_binop("sub",  (yyvsp[(1) - (3)]), (yyvsp[(3) - (3)]))); ;}
     break;
 
   case 61:
 
-    { (yyval) = QCODEY((yyvsp[(1) - (3)]), qtree_binop("div",  (yyvsp[(1) - (3)]), (yyvsp[(3) - (3)]))); ;}
+    { (yyval) = QCODEY((yyvsp[(1) - (3)]), qtree_binop("mul",  (yyvsp[(1) - (3)]), (yyvsp[(3) - (3)]))); ;}
     break;
 
   case 62:
 
-    { (yyval) = QCODEY((yyvsp[(2) - (2)]), qtree_unop("neg",   (yyvsp[(2) - (2)]))); ;}
+    { (yyval) = QCODEY((yyvsp[(1) - (3)]), qtree_binop("div",  (yyvsp[(1) - (3)]), (yyvsp[(3) - (3)]))); ;}
     break;
 
   case 63:
 
-    { (yyval) = QCODEY((yyvsp[(2) - (2)]), qtree_unop("not", (yyvsp[(2) - (2)]))); ;}
+    { (yyval) = QCODEY((yyvsp[(2) - (2)]), qtree_unop("neg",   (yyvsp[(2) - (2)]))); ;}
     break;
 
   case 64:
 
+    { (yyval) = QCODEY((yyvsp[(2) - (2)]), qtree_unop("not", (yyvsp[(2) - (2)]))); ;}
+    break;
+
+  case 65:
+
     { (yyval) = (yyvsp[(2) - (3)]); ;}
     break;
 
-  case 68:
+  case 69:
 
     { (yyval) = QCODEY((yyvsp[(5) - (5)]), new qConvert((yyvsp[(3) - (5)])->neu_type, (yyvsp[(5) - (5)]), "!!")); ;}
     break;
 
-  case 73:
+  case 74:
 
     { (yyval) = qtree_seq_append((yyvsp[(1) - (3)]), (yyvsp[(3) - (3)])); ;}
     break;
 
-  case 74:
+  case 75:
 
     { (yyval) = qtree_seq_start((yyvsp[(1) - (1)])); ;}
     break;
 
-  case 75:
-
-    { (yyval) = QCODEY((yyvsp[(1) - (1)]), qtree_type((yyvsp[(1) - (1)]))); ;}
-    break;
-
   case 76:
 
-    { (yyval) = QCODEY((yyvsp[(1) - (2)]), new qTypeHolder((yyvsp[(1) - (2)])->neu_type->createPointer())); ;}
+    { (yyval) = QCODEY((yyvsp[(1) - (1)]), qtree_type(parm->module, (yyvsp[(1) - (1)]))); ;}
     break;
 
   case 77:
 
-    { (yyval) = QCODEY((yyvsp[(2) - (2)]), new qTypeHolder((yyvsp[(2) - (2)])->neu_type->CreateConst())); ;}
+    { (yyval) = QCODEY((yyvsp[(1) - (2)]), new qTypeHolder((yyvsp[(1) - (2)])->neu_type->createPointer())); ;}
     break;
 
   case 78:
 
-    { (yyval) = QCODEY((yyvsp[(1) - (4)]), new qTypeHolder((yyvsp[(1) - (4)])->neu_type->CreateArray((yyvsp[(3) - (4)])))); ;}
+    { (yyval) = QCODEY((yyvsp[(2) - (2)]), new qTypeHolder((yyvsp[(2) - (2)])->neu_type->CreateConst())); ;}
     break;
 
   case 79:
 
-    { (yyval) = QCODEY((yyvsp[(1) - (3)]), qtree_subvariable((yyvsp[(1) - (3)]), (yyvsp[(3) - (3)]))); ;}
+    { (yyval) = QCODEY((yyvsp[(1) - (4)]), new qTypeHolder((yyvsp[(1) - (4)])->neu_type->CreateArray((yyvsp[(3) - (4)])))); ;}
     break;
 
   case 80:
 
-    { (yyval) = QCODEY((yyvsp[(1) - (3)]), qtree_subvariable(new qDereference((yyvsp[(1) - (3)])), (yyvsp[(3) - (3)]))); ;}
+    { (yyval) = QCODEY((yyvsp[(1) - (3)]), qtree_subvariable((yyvsp[(1) - (3)]), (yyvsp[(3) - (3)]))); ;}
     break;
 
   case 81:
 
-    { (yyval) = QCODEY((yyvsp[(1) - (1)]), qtree_variable((yyvsp[(1) - (1)]))); ;}
+    { (yyval) = QCODEY((yyvsp[(1) - (3)]), qtree_subvariable(new qDereference((yyvsp[(1) - (3)])), (yyvsp[(3) - (3)]))); ;}
     break;
 
   case 82:
 
-    { (yyval) = QCODEY((yyvsp[(2) - (2)]), new qPointer((yyvsp[(2) - (2)]))); ;}
+    { (yyval) = QCODEY((yyvsp[(1) - (1)]), qtree_variable((yyvsp[(1) - (1)]))); ;}
     break;
 
   case 83:
 
-    { (yyval) = QCODEY((yyvsp[(2) - (2)]), new qDereference((yyvsp[(2) - (2)]))); ;}
+    { (yyval) = QCODEY((yyvsp[(2) - (2)]), new qPointer((yyvsp[(2) - (2)]))); ;}
     break;
 
   case 84:
 
-    { (yyval) = (yyvsp[(2) - (3)]); ;}
+    { (yyval) = QCODEY((yyvsp[(2) - (2)]), new qDereference((yyvsp[(2) - (2)]))); ;}
     break;
 
   case 85:
+
+    { (yyval) = (yyvsp[(2) - (3)]); ;}
+    break;
+
+  case 86:
 
     { (yyval) = QCODEY((yyvsp[(1) - (4)]), new qArrayAccess((yyvsp[(1) - (4)]), (yyvsp[(3) - (4)]))); ;}
     break;

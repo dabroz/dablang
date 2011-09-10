@@ -1,18 +1,10 @@
 #include "stdafx.h"
 #include "dab_header.h"
-
-using std::cout;
-
-const char * q_yy_buf(void*scanner);
-size_t q_yy_pos(void*scanner);
+#include "dab_internal.h"
 
 bool produce_output = false;
 
 bool ShouldWriteOutput() { return produce_output; }
-
-std::vector<qError> compileErrors;
-
-#include <stdarg.h>
 
 int bisonfprintf(FILE * file, const char * format, ...)
 {
@@ -39,10 +31,6 @@ size_t lexlexfwrite(const void *buffer,size_t size,size_t count,FILE *stream )
 	return fwrite(buffer, size,count,stream);
 }
 
-int ERRORS_FOUND= 0;
-
-qString currentFile;
-
 void getlinefrompos(const qString & text, int pos, int & line, int & col)
 {
 	if (pos==-1) { line = -1; col = -1; }
@@ -66,7 +54,7 @@ void getlinefrompos(const qString & text, int pos, int & line, int & col)
 
 void yyerror(parse_parm *parm,void*scanner,const char*msg)
 {
-	ERRORS_FOUND++;
+	parm->errorsfound++;
 
 	const char * buf = q_yy_buf(scanner);
 	size_t pos = q_yy_pos(scanner);
@@ -88,11 +76,11 @@ void yyerror(parse_parm *parm,void*scanner,const char*msg)
 	qError err;
 	err.error = 1;
 	err.num = ERROR_SYNTAX_ERROR;
-	err.file = currentFile;
+	err.file = parm->filename;
 	err.line = lnn;
 	err.start =cll;
 	err.desc = msg;
-	compileErrors.push_back(err);
+	parm->errors.push_back(err);
 
 	qdtprintf("---------\nerror: %s\n", msg);
 	qdtprintf("line : %s\n", line.c_str());
@@ -149,7 +137,7 @@ bool runCode(qValue * prog)
 
 void run_passes(qValue * v, bool nostructures=false)
 {
-	if (!nostructures) low_GetStructs(v);
+	//if (!nostructures) low_GetStructs(v);
 	low_FindFunctions(v);
 
 	low_ReplaceForWhile(v);
@@ -188,16 +176,17 @@ bool subupdatecompiled(const char *txt, qValue * last)
 {
 	UPDATING_JIT_CODE  = true;
 	originalCode =last;
-	ERRORS_FOUND = 0;
+	//ERRORS_FOUND = 0;
 
 	qValue * ret = 0;
-	currentFile = "__virtual_update.dab";
-	parse((char*)txt, &ret);
+	//currentFile = "__virtual_update.dab";
+	std::vector<qError> errors;
+	dab_Parse((char*)txt, &ret, "__virtual_update.dab", errors, 0);
 
-	if (ERRORS_FOUND) return false;
+	if (errors.size()) return false;
 
 	ret->updateChildren();
-	ret->fixPositions(currentFile, txt);
+	ret->fixPositions("__virtual_update.dab", txt);
 
 	for (int i = 0 ;i<ret->size();i++)
 	{
@@ -228,13 +217,104 @@ bool subupdatecompiled(const char *txt, qValue * last)
 	return true;
 }
 
+
+DABCORE_API dab_Module * dab_CompileFiles(std::map<qString, qString> & files, dab_Module * module)
+{
+	setlocale(LC_ALL,"C");
+	if (!module) module = new dab_Module;
+	if (files.size() == 0) return module;
+
+	bool success = true;
+	module->_errors.clear();
+
+	for (std::map<qString, qString>::iterator it = files.begin(), end = files.end(); it != end; ++it)
+	{
+		int errorcount = module->_errors.size();
+		qValue * ret = 0;
+		dab_Parse((char*)it->second.c_str(), &ret, it->first, module->_errors, module);
+		
+		if (module->_errors.size() - errorcount) success = false;
+		else
+		{
+			ret->fixPositions(it->first, it->second);
+			module->Append(ret);
+		}
+	}
+
+	module->ProcessTypes();
+	
+	return module;
+}
+
+dt_BaseType * dab_Module::ResolveType( const std::string & name )
+{
+	return 0;
+}
+
+void dab_Module::ProcessTypes()
+{
+	for (std::map<std::string, dab_Typedef>::iterator it = _typedefs.begin(), end = _typedefs.end(); it != end; ++it)
+	{
+		if (it->second.dirty)
+		{
+			di_NotifyAboutType(it->first, it->second.node->neu_type, this);
+			it->second.dirty = false;
+		}
+	}
+	for (std::map<std::string, dab_Struct>::iterator it = _structs.begin(), end = _structs.end(); it != end; ++it)
+	{
+		if (it->second.dirty)
+		{
+			it->second.type = di_CreateStruct(it->second.node, this);
+			di_NotifyAboutType(it->first, it->second.type, this);
+			it->second.dirty = false;
+		}
+	}
+}
+
+void dab_Module::Append( qValue * program )
+{
+	// TODO: remove all old program->filename objects from module
+
+	// TODO: update only symbols that changed!
+
+	for (int i = 0; i < program->size(); i++)
+	{
+		qValue * v = (*program)[i];
+
+		if (qGlobalVariable * d = dynamic_cast<qGlobalVariable*>(v))
+		{
+			_globals[d->name] = d;
+		}
+		else if (qTypedef * t = dynamic_cast<qTypedef*>(v))
+		{
+			_typedefs[t->name] = t;
+		}
+		else if (qStruct * s = dynamic_cast<qStruct*>(v))
+		{
+			_structs[s->name] = s;
+		}
+		else if (qFunction * f = dynamic_cast<qFunction*>(v))
+		{
+			_functions[f->name] = f;
+		}
+	}
+
+	// TODO: handle removed objects (a.dab: int a; int b; b.dab: int foo() { return a; }
+	// If you remove `int a` from a.dab, `foo` in b.dab needs to be recompiled and user
+	// must receive an error
+	//
+	// Solution: global objects should store their users?
+}
+
+/*
 qValue * compileText(std::map<qString, qString> & filemap)
 {
 	setlocale(LC_ALL,"C");
 
 	if (filemap.size() == 0) return 0;
 
-	ERRORS_FOUND = 0;
+//	ERRORS_FOUND = 0;
 	ResetFunctions();
 	ResetStruct();
 
@@ -242,13 +322,14 @@ qValue * compileText(std::map<qString, qString> & filemap)
 
 	qString SSQ = "";
 
-	compileErrors.clear();
 	qValue * program = 0;
+	std::vector<qError> allerrors;
 	for (std::map<qString, qString>::iterator it = filemap.begin(), end = filemap.end(); it != end; ++it)
 	{
+		std::vector<qError> errors;
 		qValue * ret = 0;
-		currentFile = it->first;
-		parse((char*)it->second.c_str(), &ret);
+		//currentFile = it->first;
+		dab_Parse((char*)it->second.c_str(), &ret, it->first, errors);
 
 		if (ret && ShouldWriteOutput())
 		{
@@ -256,11 +337,11 @@ qValue * compileText(std::map<qString, qString> & filemap)
 			SSQ += "<pre>" + ret->print() + "</pre><hr><ul>" + ret->dumpraw() + "</ul><hr>";
 		}
 
-		if (ERRORS_FOUND) retx = false;
+		if (errors.size()) retx = false;
 		else
 		{
 			ret->updateChildren();
-			ret->fixPositions(currentFile, it->second);
+			ret->fixPositions(it->first, it->second);
 
 			if (!program) program = ret;
 			else
@@ -268,6 +349,7 @@ qValue * compileText(std::map<qString, qString> & filemap)
 				((qProgram*)program)->AppendProgram((qProgram*)ret);
 			}
 		}
+		std::copy(errors.begin(), errors.end(), std::insert_iterator<std::vector<qError> >(allerrors, allerrors.end()));
 	}
 	if (retx)
 	{
@@ -297,3 +379,4 @@ qValue * compileText(std::map<qString, qString> & filemap)
 
 	return program;
 }
+*/

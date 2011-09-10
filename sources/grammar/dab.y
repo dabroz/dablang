@@ -12,19 +12,25 @@ int isatty(int foo) { return -1; }
 
 size_t q_yy_pos(void*scanner);
 
-void parse(char *buf, qValue **result)
+void dab_Parse(char *buf, qValue **result, const std::string & filename, std::vector<qError> & errors, dab_Module * module)
 {
     parse_parm  pp;
 
     pp.buf = buf;
     pp.length = strlen(buf);
     pp.pos = 0;
+    pp.filename = filename;
+    pp.errorsfound = 0;
+    pp.module = module;
+    
     *result = 0;
     yylex_init(&pp.yyscanner);
     yyset_extra(&pp, pp.yyscanner);
     yyparse(&pp, pp.yyscanner);
     *result = pp.result;
     yylex_destroy(pp.yyscanner);
+    
+    errors = pp.errors;
 }
 
 %}
@@ -59,6 +65,7 @@ void parse(char *buf, qValue **result)
 
 result 
 	: program 							{ parm->result = $1; }
+	|									{ parm->result = qtree_program_start(0); }
 	;
 	
 program
@@ -69,9 +76,9 @@ program
 	;
 	
 definition
-	: type NAME ';' 												{ $$ = qtree_declare($1, $2); }
-	| type NAME '=' constant ';' 									{ $$ = qtree_declare_value($1, $2, $4); }	
-	| EXTERN optionaalearglist type NAME '(' arglistnull ')' ';'	{ $$ = new qExternFunc($2, $3, $4, $6); }		
+	: type NAME ';' 												{ $$ = QCODEY($2, qtree_globalvar($1, $2, 0)); }
+	| type NAME '=' constant ';' 									{ $$ = QCODEY($2, qtree_globalvar($1, $2, $4)); }	
+	| EXTERN optionaalearglist type NAME '(' arglistnull ')' ';'	{ $$ = QCODEY($4, new qExternFunc($2, $3, $4, $6)); }		
 	| type NAME '(' arglistnull ')' block 							{ $$ = QCODEY($2, qtree_function($1, $2, $4, $6)); }
 	| STRUCT NAME '{' strmember '}' ';'								{ $$ = QCODEY($2, qtree_struct($2, $4)); }
 	| TYPEDEF type NAME ';'											{ $$ = QCODEY($3, new qTypedef($3, $2)); }
@@ -176,7 +183,7 @@ paramlist
 	;
 
 type
-	: NAME 								{ $$ = QCODEY($1, qtree_type($1)); }
+	: NAME 								{ $$ = QCODEY($1, qtree_type(parm->module, $1)); }
 	| type '*'							{ $$ = QCODEY($1, new qTypeHolder($1->neu_type->createPointer())); }
 	| CONST type						{ $$ = QCODEY($2, new qTypeHolder($2->neu_type->CreateConst())); }
 	| type '<' INT '>'					{ $$ = QCODEY($1, new qTypeHolder($1->neu_type->CreateArray($3))); }

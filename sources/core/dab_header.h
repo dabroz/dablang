@@ -50,29 +50,6 @@ struct DABCORE_API float4
 	};
 };
 
-struct DABCORE_API parse_parm
-{
-	void		*yyscanner;
-	char		*buf;
-	int			pos;
-	int			length;
-	class qValue	*result;
-};
-
-void parse(char *buf, qValue **result);
-
-#define YYSTYPE         qValue*
-#define YY_EXTRA_TYPE   parse_parm *
-
-int     yylex(YYSTYPE *, void *);
-int     yylex_init(void **);
-int     yylex_destroy(void *);
-void    yyset_extra(YY_EXTRA_TYPE, void *);
-int     yyparse(parse_parm *, void *);
-void    yyerror(parse_parm *parm,void*scanner,const char*msg);
-
-#define YYDEBUG 1
-
 struct DABCORE_API qError
 {
 	int num;
@@ -93,7 +70,33 @@ struct DABCORE_API qError
 	}
 };
 
-extern std::vector<qError> compileErrors;
+struct DABCORE_API parse_parm
+{
+	void			*yyscanner;
+	char			*buf;
+	int				pos;
+	int				length;
+	class qValue	*result;
+	class dab_Module		*module;
+
+	std::string filename;
+	int errorsfound;
+	std::vector<qError> errors;
+};
+
+void dab_Parse(char *buf, qValue **result, const std::string & filename, std::vector<qError> & errors, class dab_Module * module);
+
+#define YYSTYPE         qValue*
+#define YY_EXTRA_TYPE   parse_parm *
+
+int     yylex(YYSTYPE *, void *);
+int     yylex_init(void **);
+int     yylex_destroy(void *);
+void    yyset_extra(YY_EXTRA_TYPE, void *);
+int     yyparse(parse_parm *, void *);
+void    yyerror(parse_parm *parm,void*scanner,const char*msg);
+
+#define YYDEBUG 1
 
 DABCORE_API qValue * QCODE(int pos, qValue *r);
 DABCORE_API qValue * QCODEY(qValue * from, qValue * to);
@@ -195,16 +198,6 @@ public:
 #include "qt_cstring.h"
 #include "qt_void.h"
 
-inline dt_BaseType * dt_BaseType ::createPointer()
-{
-	return qneu_PointerType::get(this, false);
-}
-
-inline dt_BaseType * dt_BaseType ::createConstPointer()
-{
-	return qneu_PointerType::get(this, true);
-}
-
 struct DABCORE_API QQLOC
 {
 	qString cmp_file;
@@ -219,6 +212,8 @@ class DABCORE_API qValue
 {
 public:
 	 QQLOC loc;
+
+	 std::string originFile;
 
 	virtual bool LLVM_build(llvm::Module * module) {return false;}
 
@@ -390,21 +385,22 @@ qValue* qtree_variable(qValue *v);
 qValue* qtree_subvariable(qValue *var, qValue * memb);
 qValue* qtree_while(qValue * cond, qValue * code);
 qValue* qtree_for(qValue * pre, qValue * test, qValue * post, qValue * code);
-qValue* qtree_type(qValue * v);
+qValue* qtree_type(dab_Module * module, qValue * v);
 qValue* qtree_struct(qValue * name, qValue * seq);
 qValue* qtree_smember(qValue * type, qValue * name);
 qValue* qtree_vararg();
+qValue* qtree_globalvar(qValue * type, qValue * name, qValue * value);
 
 void debugqv(const char * name, ...);
 
 #define DEBUGQ(...) debugqv(__FUNCTION__, ##__VA_ARGS__,0)
 
 qString binSym(const qString &name);
-qValue* qtree_type(qValue * v);
+//qValue* qtree_type(qValue * v);
 
 void low_ReplaceForWhile(qValue * program);
 void low_UpdateVarReferences(qValue * q);
-void low_GetStructs(qValue * tree);
+//void low_GetStructs(qValue * tree);
 void low_FixReturnConverts(qValue * tree);
 void low_MoveDeclarations(qValue * tree);
 void low_FindFunctions(qValue * pro);
@@ -448,3 +444,51 @@ llvm::Value * Lconstant(bool v);
 #include "qv_dereference.h"
 #include "qv_typedef.h"
 #include "qv_array.h"
+#include "qv_globalvar.h"
+
+// DLL interface
+
+struct DABCORE_API dab_Function
+{
+	qFunction * node;
+	bool dirty;
+
+	dab_Function() : node(0), dirty(false) {};
+	dab_Function(qFunction * f) : node(f), dirty(true) {};
+};
+
+struct DABCORE_API dab_Struct
+{
+	qStruct * node;
+	bool dirty;
+	qneu_StructType * type;
+
+	dab_Struct() : node(0), dirty(false), type(0) {};
+	dab_Struct(qStruct * s) : node(s), dirty(true) {};
+};
+
+struct DABCORE_API dab_Typedef
+{
+	qTypedef * node;
+	bool dirty;
+
+	dab_Typedef() : node(0), dirty(false) {};
+	dab_Typedef(qTypedef * t) : node(t), dirty(true) {};
+};
+
+class DABCORE_API dab_Module
+{
+public:
+	std::map<std::string, qGlobalVariable*> _globals;
+	std::map<std::string, dab_Typedef> _typedefs;
+	std::map<std::string, dab_Struct> _structs;
+	std::map<std::string, dab_Function> _functions;
+
+	std::vector<qError> _errors;
+
+	void Append(qValue * program);
+	void ProcessTypes();
+	dt_BaseType * ResolveType(const std::string & name);
+};
+
+DABCORE_API dab_Module * dab_CompileFiles(std::map<qString, qString> & files, dab_Module * origin);

@@ -4,7 +4,7 @@
 qValue* qtree_program_start(qValue * v)
 {
 	qProgram * q = new qProgram();
-	q->insert(v);
+	if (v) q->insert(v);
 	return q;
 }
 
@@ -130,7 +130,7 @@ qValue * qtree_smember(qValue * type, qValue * name)
 	return new qMember(type, name);
 }
 
-qValue* qtree_type(qValue * v)
+qValue* qtree_type(dab_Module * module, qValue * v)
 {
 	dt_BaseType * t = 0;
 	if (v->name == "float") t = qneu_PrimitiveType::type_float();
@@ -156,8 +156,8 @@ qValue* qtree_type(qValue * v)
 
 	if (t==0)
 	{
-		dt_BaseType * TryAddStruct(qString & name);
-		t = TryAddStruct(v->name);
+		//dt_BaseType * TryAddStruct(qString & name);
+		t = module->ResolveType(v->name);// TryAddStruct(v->name);
 		if (!t)
 		{
 			t = new qneu_RawType(v->name);
@@ -177,4 +177,10 @@ DABCORE_API qValue * QCODEY(qValue * from, qValue * to)
 {
 	to->loc = from->loc;
 	return to;
+}
+
+
+qValue* qtree_globalvar( qValue * type, qValue * name, qValue * value )
+{
+	return new qGlobalVariable(type, name, value);
 }

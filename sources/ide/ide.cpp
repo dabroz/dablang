@@ -4,7 +4,7 @@
 //#define WXUSINGDLL
 #define wxUSE_EXTENDED_RTTI 1
 
-qValue * compileText(std::map<qString, qString> & filemap);
+//qValue * compileText(std::map<qString, qString> & filemap);
 
 
 #ifdef _DEBUG
@@ -211,8 +211,8 @@ bool subupdatecompiled(const char *txt, qValue * last)
 }
 
 // TEMPORARY
-extern std::vector<qError> compileErrors;
-std::vector<qError> compileErrors;
+//extern std::vector<qError> compileErrors;
+//std::vector<qError> compileErrors;
 
 extern std::map<qString, std::vector<qneu_Function *>> functions;
 std::map<qString, std::vector<qneu_Function *>> functions;
@@ -311,10 +311,14 @@ public:
 			files[_filenames[i].c_str().AsChar()] = _codes[i]->GetText().c_str().AsChar();
 		}
 
-		lastCompile = compileText(files);
+		//lastCompile = 
+		dab_Module * mod = 	dab_CompileFiles(files, 0);
+
+		_compileErrors = mod->_errors;
 
 		bool bb = ShowErrors();
 
+		lastCompile = 0;
 		if (!lastCompile || bb) return false;
 
 		return true;
@@ -327,6 +331,8 @@ public:
 
 		return true;
 	}
+
+	std::vector<qError> _compileErrors;
 
 	bool ShowErrors()
 	{
@@ -341,11 +347,11 @@ public:
 
 		std::map<qString, std::map<int, qString> > annotationsStyle;
 
-		std::sort(compileErrors.begin(), compileErrors.end());
+		std::sort(_compileErrors.begin(), _compileErrors.end());
 
-		for (int i = 0; i < compileErrors.size(); i++)
+		for (int i = 0; i < _compileErrors.size(); i++)
 		{
-			qError & qe = compileErrors[i];
+			qError & qe = _compileErrors[i];
 
 			_errors->InsertItem(i, "", qe.error?0:1);
 
@@ -411,7 +417,7 @@ public:
 
 	void OnErrorClick(wxListEvent & event)
 	{
-		qError & e = compileErrors[event.GetIndex()];
+		qError & e = _compileErrors[event.GetIndex()];
 		int line = e.line - 1;
 
 		for (int i = 0; i < _filenames.size(); i++)
