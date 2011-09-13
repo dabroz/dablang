@@ -2,7 +2,7 @@
 #include "dab_header.h"
 #include "dab_internal.h"
 
-bool produce_output = false;
+bool produce_output = true;
 
 bool ShouldWriteOutput() { return produce_output; }
 
@@ -240,6 +240,9 @@ DABCORE_API dab_Module * dab_CompileFiles(std::map<qString, qString> & files, da
 			module->Append(ret);
 		}
 	}
+
+	if (ShouldWriteOutput()) 
+		setFile("x2_compile.html", module->Dump());
 
 	module->ProcessTypes();
 	

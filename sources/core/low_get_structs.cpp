@@ -19,8 +19,17 @@ void notifyNewType(const qString & name, dt_BaseType * s, qValue * tree )
 	}
 }
 
-void notifyStruct(const qString & name, dt_BaseType * s, qneu_StructType * st ) 
+void notifyStruct(const qString & newTypeName, dt_BaseType * newType, qneu_StructType * st, dab_Module * module) 
 {
+	for (int i = 0; i < st->members.size(); i++)
+	{
+		StructMember & sm = st->members[i];
+		
+		if (sm.type->isRaw() && sm.name == newTypeName && sm.type->isConst() == newType->isConst())
+		{
+			sm.type = newType;
+		}
+	}
 }
 
 void di_NotifyAboutType(const std::string & name, dt_BaseType * type, dab_Module * module)
@@ -32,8 +41,8 @@ void di_NotifyAboutType(const std::string & name, dt_BaseType * type, dab_Module
 	}
 	for (std::map<std::string, dab_Struct>::iterator it = module->_structs.begin(), end = module->_structs.end(); it != end; ++it)
 	{
-		notifyStruct(name, type, it->second.type);
-		notifyStruct(name, type, it->second.type->constver);
+		notifyStruct(name, type, it->second.type, module);
+		notifyStruct(name, type, it->second.type->constver, module);
 	}
 }
 

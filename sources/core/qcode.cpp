@@ -158,3 +158,42 @@ void qValue::fireError( bool error, int num, const qString & desc )
 	err.desc = desc;
 	//TODO! compileErrors.push_back(err);
 }
+
+
+std::string dab_Module::Dump() 
+{
+	std::string ret;
+
+	ret += "<h2>Globals</h2><ul>";
+	for (it_g it = _globals.begin(), end = _globals.end(); it != end; ++it)
+	{
+		ret += "<li>" + it->second->dumprawX() + "</li>";
+	}
+	ret += "</ul><hr>";
+	ret += "<h2>Structs</h2>";
+	for (it_s it = _structs.begin(), end = _structs.end(); it != end; ++it)
+	{
+		dab_Struct & s = it->second;
+
+		ret += "<h3>" + s.type->name() + "</h3>";
+	}
+	ret += "<hr>";
+	ret += "<h2>Typedefs</h2><ul>";
+	for (it_t it = _typedefs.begin(), end = _typedefs.end(); it != end; ++it)
+	{
+		dab_Typedef & t = it->second;
+
+		ret += t.node->dumpraw();
+	}
+	ret += "</ul><hr>";
+	ret += "<h2>Functions</h2>";
+	for (it_f it = _functions.begin(), end = _functions.end(); it != end; ++it)
+	{
+		dab_Function & f = it->second;
+
+		ret += "<h3>" + f.node->name + "</h3>";
+		ret += "<ul>" + f.node->dumpraw() + "</ul>";
+	}
+
+	return ret;
+}

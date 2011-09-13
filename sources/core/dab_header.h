@@ -479,16 +479,30 @@ struct DABCORE_API dab_Typedef
 class DABCORE_API dab_Module
 {
 public:
-	std::map<std::string, qGlobalVariable*> _globals;
-	std::map<std::string, dab_Typedef> _typedefs;
-	std::map<std::string, dab_Struct> _structs;
-	std::map<std::string, dab_Function> _functions;
+	typedef std::map<std::string, qGlobalVariable*> map_g;	
+	typedef std::map<std::string, dab_Typedef> map_t;
+	typedef std::map<std::string, dab_Struct> map_s;
+	typedef std::map<std::string, dab_Function> map_f;
+	
+	typedef map_g::iterator it_g;
+	typedef map_t::iterator it_t;
+	typedef map_s::iterator it_s;
+	typedef map_f::iterator it_f;
+	
+	map_g _globals;
+	map_t _typedefs;
+	map_s _structs;
+	map_f _functions;
 
 	std::vector<qError> _errors;
 
 	void Append(qValue * program);
 	void ProcessTypes();
 	dt_BaseType * ResolveType(const std::string & name);
+
+	std::string Dump();
+
+
 };
 
 DABCORE_API dab_Module * dab_CompileFiles(std::map<qString, qString> & files, dab_Module * origin);
