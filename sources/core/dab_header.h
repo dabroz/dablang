@@ -464,7 +464,7 @@ struct DABCORE_API dab_Struct
 	qneu_StructType * type;
 
 	dab_Struct() : node(0), dirty(false), type(0) {};
-	dab_Struct(qStruct * s) : node(s), dirty(true) {};
+	dab_Struct(qStruct * s) : node(s), dirty(true), type(0) {};
 };
 
 struct DABCORE_API dab_Typedef

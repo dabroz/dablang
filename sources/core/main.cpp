@@ -245,7 +245,10 @@ DABCORE_API dab_Module * dab_CompileFiles(std::map<qString, qString> & files, da
 		setFile("x2_compile.html", module->Dump());
 
 	module->ProcessTypes();
-	
+
+	if (ShouldWriteOutput()) 
+		setFile("x3_compile.html", module->Dump());
+
 	return module;
 }
 

@@ -5,8 +5,8 @@ struct DABCORE_API StructMember
 	dt_BaseType * type;
 	qString name;
 
-	int offset;
-	int size;
+	//int offset;
+	//int size;
 };
 
 class DABCORE_API qneu_StructType : public dt_BaseType

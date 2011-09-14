@@ -175,7 +175,17 @@ std::string dab_Module::Dump()
 	{
 		dab_Struct & s = it->second;
 
+		if (!s.type) { ret += "<h3>ERROR '" + s.node->name + "'</h3>"; continue; }
+		
 		ret += "<h3>" + s.type->name() + "</h3>";
+
+		ret += "<table border><tr><th>Name</th><th colspan=2>Type</th></tr>";
+		for (int j = 0; j < s.type->members.size(); j++)
+		{
+			StructMember & sm = s.type->members[j];
+			ret += "<tr><td>" + sm.name + "</td><td>"+qString(typeid(*sm.type).name()).substr(6)+"</td><td>" + sm.type->name() + "</td></tr>";
+		}
+		ret += "</table>";
 	}
 	ret += "<hr>";
 	ret += "<h2>Typedefs</h2><ul>";

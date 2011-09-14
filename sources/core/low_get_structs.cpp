@@ -21,6 +21,7 @@ void notifyNewType(const qString & name, dt_BaseType * s, qValue * tree )
 
 void notifyStruct(const qString & newTypeName, dt_BaseType * newType, qneu_StructType * st, dab_Module * module) 
 {
+	qdtprintf("'%s' notifies struct '%s%s'\n", newTypeName.c_str(), ((st->isConst())?"const ":""), st->name().c_str());
 	for (int i = 0; i < st->members.size(); i++)
 	{
 		StructMember & sm = st->members[i];
@@ -34,15 +35,24 @@ void notifyStruct(const qString & newTypeName, dt_BaseType * newType, qneu_Struc
 
 void di_NotifyAboutType(const std::string & name, dt_BaseType * type, dab_Module * module)
 {
-	for (std::map<std::string, dab_Function>::iterator it = module->_functions.begin(), end = module->_functions.end(); it != end; ++it)
+	qdtprintf("di_NotifyAboutType('%s')\n", name.c_str());
+	for (dab_Module::it_f it = module->_functions.begin(), end = module->_functions.end(); it != end; ++it)
 	{
 		qFunction * f = it->second.node;
 		notifyNewType(name, type, f);
 	}
-	for (std::map<std::string, dab_Struct>::iterator it = module->_structs.begin(), end = module->_structs.end(); it != end; ++it)
+	for (dab_Module::it_t it = module->_typedefs.begin(), end = module->_typedefs.end(); it != end; ++it)
 	{
-		notifyStruct(name, type, it->second.type, module);
-		notifyStruct(name, type, it->second.type->constver, module);
+		notifyNewType(name, type, it->second.node);
+	}
+	for (dab_Module::it_s it = module->_structs.begin(), end = module->_structs.end(); it != end; ++it)
+	{
+		notifyNewType(name, type, it->second.node);
+		if (it->second.type)
+		{
+			notifyStruct(name, type, it->second.type, module);
+			notifyStruct(name, type, it->second.type->constver, module);
+		}
 	}
 }
 
@@ -79,30 +89,3 @@ qneu_StructType * di_CreateStruct(qStruct * str, dab_Module * module)
 
 	return s;
 }
-
-/*
-void notifyNewType2(qString name, dt_BaseType * s, qValue * tree ) 
-{
-	for (std::map<qString, qneu_StructType*>::iterator it = structs.begin(), end = structs.end(); it != end; it++)
-	{
-		std::vector<StructMember> & sm = it->second->members;
-		std::vector<StructMember> & sm2 = it->second->constver->members;
-		for (int k = 0; k < sm.size(); k++)
-		{
-			qneu_RawType * rr = dynamic_cast<qneu_RawType*>(sm[k].type);
-			if (rr && rr->tname == name && rr->is_const == s->is_const)
-			{
-				sm[k].type = s;
-			}
-		}
-		for (int k = 0; k < sm2.size(); k++)
-		{
-			qneu_RawType * rr = dynamic_cast<qneu_RawType*>(sm2[k].type);
-			if (rr && rr->tname == name && rr->is_const == s->is_const)
-			{
-				sm2[k].type = s;
-			}
-		}
-	}
-}
-*/
