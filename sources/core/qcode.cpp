@@ -207,3 +207,86 @@ std::string dab_Module::Dump()
 
 	return ret;
 }
+
+
+bool qValue::remove_from_parent()
+{
+	for (int i =0; i < parent->size(); i++)
+	{
+		if (parent->children[i]==this)
+		{
+			parent->children.erase(parent->children.begin() + i);
+			parent->updateChildren();
+			parent = 0;
+			return true;
+		}
+	}
+	return false;
+}
+
+bool qValue::replace_child(qValue * from, qValue * to)
+{
+	for (int i =0; i < size(); i++)
+	{
+		if (children[i]==from)
+		{
+			from->parent = 0;
+			children[i] = to;
+			updateChildren();
+			return true;
+		}
+	}
+	return false;
+}
+
+bool qValue::replace_in_parent(qValue * newvalue)
+{
+	for (int i =0; i < parent->size(); i++)
+	{
+		if (parent->children[i]==this)
+		{
+			parent->children[i] = newvalue;
+			newvalue->parent = parent;
+			parent->updateChildren();
+			parent = 0;
+			return true;
+		}
+	}
+	return false;
+}
+
+bool qValue::is_parent(qValue * v)
+{
+	if (this==v) return true;
+	if (!parent) return false;
+	return parent->is_parent(v);
+}
+
+qValue::qValue() : neu_type(0), parent((qValue*)0)
+{
+	loc.cmp_pos=-1;
+};
+
+void qValue::updateChildren()
+{
+	for (size_t i = 0, e = size(); i < e; i++)
+	{
+		children[i]->parent = this;
+		children[i]->updateChildren();
+	}
+}
+
+void qValue::fixPositions( const qString & file, const qString & str , class dab_Module * m) 
+{
+	the_module = m;
+
+	void getlinefrompos(const qString & text, int pos, int & line, int & col);
+
+	loc.cmp_file = file;
+	getlinefrompos(str, loc.cmp_pos, loc.cmp_line, loc.cmp_col);
+
+	for (int i = 0; i < size(); i++)
+	{
+		children[i]->fixPositions(file, str, m);
+	}
+}

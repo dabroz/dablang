@@ -178,6 +178,7 @@ public:
 	virtual bool is_integer() const { return false; }
 
 	virtual qString name() const { return "{??}"; }
+	virtual qString rawname() const { return name(); }
 	virtual qString mangle() const { return "?"; }
 
 	virtual bool can_cast_to(dt_BaseType * other) const { return false; }
@@ -212,62 +213,17 @@ class DABCORE_API qValue
 {
 public:
 	 QQLOC loc;
-
 	 std::string originFile;
+	 dab_Module * the_module;
 
 	virtual bool LLVM_build(llvm::Module * module) {return false;}
-
 	virtual void LLVM_prebuild(llvm::Module * module) {}
-
 	virtual llvm::Value * BuildValue() { return 0; }
-
 	virtual llvm::Value * getLlvmVariable() { return 0; }
 
-	bool remove_from_parent()
-	{
-		for (int i =0; i < parent->size(); i++)
-		{
-			if (parent->children[i]==this)
-			{
-				parent->children.erase(parent->children.begin() + i);
-				parent->updateChildren();
-				parent = 0;
-				return true;
-			}
-		}
-		return false;
-	}
-
-	bool replace_child(qValue * from, qValue * to)
-	{
-		for (int i =0; i < size(); i++)
-		{
-			if (children[i]==from)
-			{
-				from->parent = 0;
-				children[i] = to;
-				updateChildren();
-				return true;
-			}
-		}
-		return false;
-	}
-
-	bool replace_in_parent(qValue * newvalue)
-	{
-		for (int i =0; i < parent->size(); i++)
-		{
-			if (parent->children[i]==this)
-			{
-				parent->children[i] = newvalue;
-				newvalue->parent = parent;
-				parent->updateChildren();
-				parent = 0;
-				return true;
-			}
-		}
-		return false;
-	}
+	bool remove_from_parent();
+	bool replace_child(qValue * from, qValue * to);
+	bool replace_in_parent(qValue * newvalue);
 
 	dt_BaseType * neu_type;
 	qValue * parent;
@@ -278,17 +234,9 @@ public:
 	qString name;
 	qValueVec children;
 
-	bool is_parent(qValue * v)
-	{
-		if (this==v) return true;
-		if (!parent) return false;
-		return parent->is_parent(v);
-	}
+	bool is_parent(qValue * v);
 
-	qValue() : neu_type(0), parent((qValue*)0)
-	{
-		loc.cmp_pos=-1;
-	};
+	qValue();
 
 	virtual ~qValue() {}
 
@@ -311,14 +259,7 @@ public:
 	qString dumpraw();
 	qString dumprawX();
 
-	void updateChildren()
-	{
-		for (size_t i = 0, e = size(); i < e; i++)
-		{
-			children[i]->parent = this;
-			children[i]->updateChildren();
-		}
-	}
+	void updateChildren();
 
 	virtual void gatherVariables();
 
@@ -335,18 +276,7 @@ public:
 
 	class qFunction  * function();
 
-	void fixPositions( const qString & file, const qString & str ) 
-	{
-		void getlinefrompos(const qString & text, int pos, int & line, int & col);
-
-		loc.cmp_file = file;
-		getlinefrompos(str, loc.cmp_pos, loc.cmp_line, loc.cmp_col);
-
-		for (int i = 0; i < size(); i++)
-		{
-			children[i]->fixPositions(file, str);
-		}
-	}
+	void fixPositions( const qString & file, const qString & str, class dab_Module * m );
 
 	void fireError(bool error, int num, const qString & desc);
 

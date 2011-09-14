@@ -16,10 +16,10 @@ static void updateref_internal( qVariable * var )
 	if (!decmatch)
 	{
 		qProgram * prog = dynamic_cast<qProgram*>(var->function()->parent);
-		if (prog->globalvars.count(var->name))
+/*		if (prog->globalvars.count(var->name))
 		{
 			decmatch = prog->globalvars[var->name];
-		}
+		}*/
 	}
 
 	if (!decmatch)

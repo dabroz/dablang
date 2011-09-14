@@ -33,8 +33,8 @@ void qProgram::AppendProgram( qProgram * prog )
 	{
 		this->insert((*prog)[i]);
 	}
-	for (std::map<qString, qDeclare*>::iterator it = prog->globalvars.begin(), end = prog->globalvars.end(); it != end; ++it)
+/*	for (std::map<qString, qDeclare*>::iterator it = prog->globalvars.begin(), end = prog->globalvars.end(); it != end; ++it)
 	{
 		globalvars[it->first] = it->second;
-	}
+	}*/
 }

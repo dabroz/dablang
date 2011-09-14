@@ -10,4 +10,5 @@ public:
 	virtual dt_BaseType * updateWithType(const qString & newname, dt_BaseType * s );
 	virtual llvm::Type * llvm () { qdterror("LLVM qneu_RawType!"); return 0; }
 	virtual dt_BaseType * CreateConst() { qneu_RawType * rr = new qneu_RawType(tname); rr->is_const = true; return rr; }
+	virtual qString rawname() const { return tname; }
 };

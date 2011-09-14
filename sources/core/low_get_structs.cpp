@@ -26,8 +26,10 @@ void notifyStruct(const qString & newTypeName, dt_BaseType * newType, qneu_Struc
 	{
 		StructMember & sm = st->members[i];
 		
-		if (sm.type->isRaw() && sm.name == newTypeName && sm.type->isConst() == newType->isConst())
+		if (sm.type->isRaw() && sm.type->rawname() == newTypeName && sm.type->isConst() == newType->isConst())
 		{
+			//qdtprintf("'%s' -> '%s%s' :: replaced field '%s'\n",  newTypeName.c_str(), ((st->isConst())?"const ":""), st->name().c_str(),
+			//	sm.name.c_str());
 			sm.type = newType;
 		}
 	}
@@ -35,7 +37,7 @@ void notifyStruct(const qString & newTypeName, dt_BaseType * newType, qneu_Struc
 
 void di_NotifyAboutType(const std::string & name, dt_BaseType * type, dab_Module * module)
 {
-	qdtprintf("di_NotifyAboutType('%s')\n", name.c_str());
+	//qdtprintf("di_NotifyAboutType('%s')\n", name.c_str());
 	for (dab_Module::it_f it = module->_functions.begin(), end = module->_functions.end(); it != end; ++it)
 	{
 		qFunction * f = it->second.node;

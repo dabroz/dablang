@@ -114,7 +114,8 @@ Value * qFunction::VarLocal( qString mangledName )
 
 Value * qFunction::VarGlobal( qString realname )
 {
-	qProgram * prog = dynamic_cast<qProgram*>(parent);
+	return 0;
+	/*qProgram * prog = dynamic_cast<qProgram*>(parent);
 	qString pname = realname.substr(3);
 	std::map<qString,qDeclare*>::iterator it = prog->globalvars.find(pname);
 	if (it == prog->globalvars.end()) 
@@ -127,7 +128,7 @@ Value * qFunction::VarGlobal( qString realname )
 	{
 		qdterror("found `%s` at `%p`(0) -- declare '%p'\n", realname.c_str(), ret, it->second);
 	}
-	return ret;
+	return ret;*/
 }
 
 Value * qFunction::getVariable( qString realname )

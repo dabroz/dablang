@@ -18,25 +18,18 @@ static qValue * LowerPass_internal(qValue * v)
 	return qtree_block(seq);
 }
 
-void try_replace(qValue * & q)
-{
-	qFor * _for = dynamic_cast<qFor*>(q);
-	if (_for)
-	{
-		q = LowerPass_internal(_for);
-		low_ReplaceForWhile(q);
-	}
-	else
-	{
-		low_ReplaceForWhile(q);
-	}
-}
 
 void low_ReplaceForWhile(qValue * program)
 {
 	for (int i = 0; i < program->size(); i++)
 	{
-		try_replace(program->children[i]);
+		qValue * & q = program->children[i];
+		if (qFor * _for = dynamic_cast<qFor*>(q))
+		{
+			q = LowerPass_internal(_for);
+		}
+		program->updateChildren();
+		low_ReplaceForWhile(q);
 		program->updateChildren();
 	}
 }

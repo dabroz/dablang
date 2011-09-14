@@ -171,51 +171,51 @@ qValue * update_funcs()
 	}
 	return updateCode;
 }
-
-bool subupdatecompiled(const char *txt, qValue * last)
-{
-	UPDATING_JIT_CODE  = true;
-	originalCode =last;
-	//ERRORS_FOUND = 0;
-
-	qValue * ret = 0;
-	//currentFile = "__virtual_update.dab";
-	std::vector<qError> errors;
-	dab_Parse((char*)txt, &ret, "__virtual_update.dab", errors, 0);
-
-	if (errors.size()) return false;
-
-	ret->updateChildren();
-	ret->fixPositions("__virtual_update.dab", txt);
-
-	for (int i = 0 ;i<ret->size();i++)
-	{
-		if (dynamic_cast<qDeclare*>(ret->children[i]))
-		{
-			ret->children[i]->remove_from_parent();
-			i--;
-		}
-	}
-
-	qProgram * prog0 = (qProgram*)originalCode;
-	qProgram * prog1 = (qProgram*)ret;
-
-	for (std::map<qString, qDeclare*>::iterator it = prog0->globalvars.begin(), end = prog0->globalvars.end(); it != end; ++it)
-	{
-		prog1->globalvars[it->first] = it->second;
-	}
-
-	run_passes(ret,true);
-	low_MoveDeclarations(ret);
-	low_CheckTypes(ret);
-
-	updateCode = ret;
-
-	if (ShouldWriteOutput()) 
-		setFile("UPDATE.html", "<ul>" + ret->dumpraw() + "</ul>");
-
-	return true;
-}
+//
+//bool subupdatecompiled(const char *txt, qValue * last)
+//{
+//	UPDATING_JIT_CODE  = true;
+//	originalCode =last;
+//	//ERRORS_FOUND = 0;
+//
+//	qValue * ret = 0;
+//	//currentFile = "__virtual_update.dab";
+//	std::vector<qError> errors;
+//	dab_Parse((char*)txt, &ret, "__virtual_update.dab", errors, 0);
+//
+//	if (errors.size()) return false;
+//
+//	ret->updateChildren();
+//	ret->fixPositions("__virtual_update.dab", txt);
+//
+//	for (int i = 0 ;i<ret->size();i++)
+//	{
+//		if (dynamic_cast<qDeclare*>(ret->children[i]))
+//		{
+//			ret->children[i]->remove_from_parent();
+//			i--;
+//		}
+//	}
+//
+//	qProgram * prog0 = (qProgram*)originalCode;
+//	qProgram * prog1 = (qProgram*)ret;
+///*
+//	for (std::map<qString, qDeclare*>::iterator it = prog0->globalvars.begin(), end = prog0->globalvars.end(); it != end; ++it)
+//	{
+//		prog1->globalvars[it->first] = it->second;
+//	}
+//*/
+//	run_passes(ret,true);
+//	low_MoveDeclarations(ret);
+//	low_CheckTypes(ret);
+//
+//	updateCode = ret;
+//
+//	if (ShouldWriteOutput()) 
+//		setFile("UPDATE.html", "<ul>" + ret->dumpraw() + "</ul>");
+//
+//	return true;
+//}
 
 
 DABCORE_API dab_Module * dab_CompileFiles(std::map<qString, qString> & files, dab_Module * module)
@@ -236,7 +236,8 @@ DABCORE_API dab_Module * dab_CompileFiles(std::map<qString, qString> & files, da
 		if (module->_errors.size() - errorcount) success = false;
 		else
 		{
-			ret->fixPositions(it->first, it->second);
+			ret->fixPositions(it->first, it->second, module);
+			low_ReplaceForWhile(ret);
 			module->Append(ret);
 		}
 	}
@@ -245,6 +246,12 @@ DABCORE_API dab_Module * dab_CompileFiles(std::map<qString, qString> & files, da
 		setFile("x2_compile.html", module->Dump());
 
 	module->ProcessTypes();
+
+	/*
+	v->gatherVariables();
+	low_UpdateVarReferences(v);
+	v->updateType();
+	low_FixReturnConverts(v);*/
 
 	if (ShouldWriteOutput()) 
 		setFile("x3_compile.html", module->Dump());

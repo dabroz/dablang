@@ -3,7 +3,7 @@
 
 void qDeclare::gatherVariables()
 {
-	qProgram * prog = dynamic_cast<qProgram*>(parent);
+	/*qProgram * prog = dynamic_cast<qProgram*>(parent);
 	if (prog)
 	{
 		vartype = VAR_GLOBAL;
@@ -12,7 +12,7 @@ void qDeclare::gatherVariables()
 		prog->globalvars[pretty_name] = this;
 
 		return;
-	}
+	}*/
 	qSequence * seq = dynamic_cast<qSequence*>(parent);
 	if (seq)
 	{
