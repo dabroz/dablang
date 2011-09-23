@@ -16,6 +16,7 @@ public:
 	llvm::Value * llvmvar;
 	void * dataptr;
 
+	qDeclare(dt_BaseType * _type, const qString & _name, qValue * _value);
 	qDeclare(qValue * _type, qValue * _name, qValue * _value);
 
 	qString print(int indent);

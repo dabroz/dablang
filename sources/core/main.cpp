@@ -218,6 +218,14 @@ qValue * update_funcs()
 //}
 
 
+void dab_Module::ProcessFunctions( procfun fun )
+{
+	for (it_f it = _functions.begin(), end = _functions.end(); it != end; ++it)
+	{
+		fun(it->second);
+	}
+}
+
 DABCORE_API dab_Module * dab_CompileFiles(std::map<qString, qString> & files, dab_Module * module)
 {
 	setlocale(LC_ALL,"C");
@@ -246,6 +254,8 @@ DABCORE_API dab_Module * dab_CompileFiles(std::map<qString, qString> & files, da
 		setFile("x2_compile.html", module->Dump());
 
 	module->ProcessTypes();
+	
+	module->ProcessFunctions(CopyArgumentsToStack);
 
 	/*
 	v->gatherVariables();

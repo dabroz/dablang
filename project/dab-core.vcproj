@@ -219,6 +219,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\sources\core\low_funargs.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\sources\core\low_get_functions.cpp"
 				>
 			</File>
@@ -340,6 +344,14 @@
 			</File>
 			<File
 				RelativePath="..\sources\core\qv_for.h"
+				>
+			</File>
+			<File
+				RelativePath="..\sources\core\qv_funarg.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\sources\core\qv_funarg.h"
 				>
 			</File>
 			<File

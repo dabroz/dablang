@@ -7,3 +7,5 @@ size_t q_yy_pos(void*scanner);
 
 void di_NotifyAboutType(const std::string & name, dt_BaseType * type, dab_Module * module);
 qneu_StructType * di_CreateStruct(qStruct * str, dab_Module * module);
+
+void CopyArgumentsToStack(dab_Function & fun);

@@ -19,6 +19,12 @@ DABCORE_API void qdterror(const char * format, ...);
 
 DABCORE_API void replace_all(std::string &str, const std::string &find_what, const std::string &replace_with);
 
+template <typename T, typename T2>
+void push_front(T & vec, const T2 & elem)
+{
+	vec.insert(vec.begin(), elem);
+}
+
 enum
 {
 	TYPE_UNKNOWN,
@@ -242,6 +248,7 @@ public:
 
 	void backtrace(int q = 0);
 	void insert(qValue * v) { if (v) {children.push_back(v);  updateChildren();} }
+	void insertFront(qValue * v) { if (v) {push_front(children,v);  updateChildren();} }
 	size_t size() const { return children.size(); }
 	qValue * L() { if (size() < 1) return 0; return children[0]; }
 	qValue * R() { if (size() < 2) return 0; return children[1]; }
@@ -375,6 +382,7 @@ llvm::Value * Lconstant(bool v);
 #include "qv_typedef.h"
 #include "qv_array.h"
 #include "qv_globalvar.h"
+#include "qv_funarg.h"
 
 // DLL interface
 
@@ -432,6 +440,9 @@ public:
 
 	std::string Dump();
 
+	typedef void (procfun)(dab_Function &);
+
+	void ProcessFunctions(procfun fun);
 
 };
 

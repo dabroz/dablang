@@ -71,6 +71,18 @@ qDeclare::qDeclare( qValue * _type, qValue * _name, qValue * _value )
 	dataptr = 0;
 }
 
+qDeclare::qDeclare( dt_BaseType * _type, const qString & _name, qValue * _value )
+{
+	this->neu_type = _type;
+	this->name = _name;
+	if (_value) insert(_value);
+
+	pretty_name = name;
+	llvmvar = 0;
+	vartype = -1;
+	dataptr = 0;
+}
+
 qString qDeclare::print( int indent )
 {
 	qString ret = doIndent(indent) + printType(neu_type) + " $" + name;
