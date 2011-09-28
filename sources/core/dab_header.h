@@ -336,7 +336,7 @@ qString binSym(const qString &name);
 //qValue* qtree_type(qValue * v);
 
 void low_ReplaceForWhile(qValue * program);
-void low_UpdateVarReferences(qValue * q);
+//void low_UpdateVarReferences(qValue * q);
 //void low_GetStructs(qValue * tree);
 void low_FixReturnConverts(qValue * tree);
 void low_MoveDeclarations(qValue * tree);
@@ -388,6 +388,7 @@ llvm::Value * Lconstant(bool v);
 
 struct DABCORE_API dab_Function
 {
+	dab_Module * parent;
 	qFunction * node;
 	bool dirty;
 

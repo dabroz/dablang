@@ -134,7 +134,7 @@ bool runCode(qValue * prog)
 	qString  qww = RunLLVMBuilding(prog);
 	return true;
 }
-
+/*
 void run_passes(qValue * v, bool nostructures=false)
 {
 	//if (!nostructures) low_GetStructs(v);
@@ -142,11 +142,11 @@ void run_passes(qValue * v, bool nostructures=false)
 
 	low_ReplaceForWhile(v);
 	v->gatherVariables();
-	low_UpdateVarReferences(v);
+	//low_UpdateVarReferences(v);
 	v->updateType();
 	low_FixReturnConverts(v);
 }
-
+*/
 qValue * updateCode = 0;
 qValue * originalCode = 0;
 
@@ -256,6 +256,9 @@ DABCORE_API dab_Module * dab_CompileFiles(std::map<qString, qString> & files, da
 	module->ProcessTypes();
 	
 	module->ProcessFunctions(CopyArgumentsToStack);
+	module->ProcessFunctions(GatherVariables);
+	module->ProcessFunctions(ResolveVariables);
+	module->ProcessFunctions(CleanupVariables);
 
 	/*
 	v->gatherVariables();
@@ -320,6 +323,7 @@ void dab_Module::Append( qValue * program )
 		else if (qFunction * f = dynamic_cast<qFunction*>(v))
 		{
 			_functions[f->name] = f;
+			_functions[f->name].parent = this;
 		}
 	}
 

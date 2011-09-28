@@ -13,7 +13,7 @@ void qDeclare::gatherVariables()
 
 		return;
 	}*/
-	qSequence * seq = dynamic_cast<qSequence*>(parent);
+	/*qSequence * seq = dynamic_cast<qSequence*>(parent);
 	if (seq)
 	{
 		qFunction * fun = dynamic_cast<qFunction*>(seq->parent);
@@ -25,7 +25,7 @@ void qDeclare::gatherVariables()
 			fun->variablesavail.push_back(this);
 			return;
 		}
-	}
+	}*/
 	// local var
 	char nn[128];
 	sprintf(nn, "_l_%08X_", this);

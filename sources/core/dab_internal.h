@@ -9,3 +9,6 @@ void di_NotifyAboutType(const std::string & name, dt_BaseType * type, dab_Module
 qneu_StructType * di_CreateStruct(qStruct * str, dab_Module * module);
 
 void CopyArgumentsToStack(dab_Function & fun);
+void GatherVariables(dab_Function & fun);
+void ResolveVariables(dab_Function & fun);
+void CleanupVariables(dab_Function & fun);

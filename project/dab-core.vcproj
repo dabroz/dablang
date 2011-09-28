@@ -223,6 +223,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\sources\core\low_gather_vars.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\sources\core\low_get_functions.cpp"
 				>
 			</File>
