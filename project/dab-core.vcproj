@@ -239,6 +239,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\sources\core\low_resolve_types.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\sources\core\low_return_converts.cpp"
 				>
 			</File>

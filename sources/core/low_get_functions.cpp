@@ -26,13 +26,13 @@ void notifyNewFunc(qString name, qneu_Function * f, qValue * tree )
 	}
 }
 
-std::map<qString, std::vector<qneu_Function *>> functions;
+//std::map<qString, std::vector<qneu_Function *>> functions;
 
 std::map<qString, Function*> very_raw_funcs;
 
 void ResetFunctions()
 {
-	functions.clear();
+	//functions.clear();
 	very_raw_funcs.clear();
 }
 
@@ -43,13 +43,13 @@ bool qneu_Function::isvararg() const {
 
 void qFuncall::subupdateType()
 {
-	std::vector<qneu_Function *> & vv = functions[name];
+	std::vector<dab_Function> & vv = the_module->_functions[name];
 	qSequence * seq = dynamic_cast<qSequence*>(L());
 	std::map<qneu_Function*, int> best_score;
 
 	for (int i = 0; i < vv.size(); i++)
 	{
-		qneu_Function * f = vv[i];
+		qneu_Function * f = vv[i].node->func;
 		int score = 0;
 		int maxq = seq->size();
 		if(f->isvararg()) 
@@ -112,10 +112,10 @@ void qFuncall::subupdateType()
 			for (int i = 0; i< vv.size(); i++)
 			{
 				qString papa;
-				for (int j =0;j<vv[i]->args.size(); j++)
+				for (int j =0;j<vv[i].node->func->args.size(); j++)
 				{	
 					if (j) papa+=", ";
-					papa += vv[i]->args[j].type->name();
+					papa += vv[i].node->func->args[j].type->name();
 				}
 				//           "No matching call for `
 				sprintf(msg, "Candidates are:      `%s(%s)`", name.c_str(), papa.c_str());
@@ -172,7 +172,7 @@ qneu_Function::qneu_Function( class qFunction * fun )
 
 	llvmd = 0;
 }
-
+/*
 void create_func(qValue * prog,qFunction * f)
 {
 	qneu_Function * func = new qneu_Function(f);
@@ -187,4 +187,4 @@ void low_FindFunctions(qValue * pro)
 		qFunction * f= dynamic_cast<qFunction *>(tree);
 		if (f) create_func(pro,f);
 	}
-}
+}*/

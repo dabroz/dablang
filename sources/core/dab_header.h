@@ -340,7 +340,7 @@ void low_ReplaceForWhile(qValue * program);
 //void low_GetStructs(qValue * tree);
 void low_FixReturnConverts(qValue * tree);
 void low_MoveDeclarations(qValue * tree);
-void low_FindFunctions(qValue * pro);
+//void low_FindFunctions(qValue * pro);
 void low_CheckTypes(qValue * v);
 
 qString  RunLLVMBuilding(qValue * prog);
@@ -421,7 +421,7 @@ public:
 	typedef std::map<std::string, qGlobalVariable*> map_g;	
 	typedef std::map<std::string, dab_Typedef> map_t;
 	typedef std::map<std::string, dab_Struct> map_s;
-	typedef std::map<std::string, dab_Function> map_f;
+	typedef std::map<std::string, std::vector<dab_Function> > map_f;
 	
 	typedef map_g::iterator it_g;
 	typedef map_t::iterator it_t;

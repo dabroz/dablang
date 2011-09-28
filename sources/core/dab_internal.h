@@ -12,3 +12,5 @@ void CopyArgumentsToStack(dab_Function & fun);
 void GatherVariables(dab_Function & fun);
 void ResolveVariables(dab_Function & fun);
 void CleanupVariables(dab_Function & fun);
+void ResolveTypes(dab_Function & fun);
+void BuildFunctions(dab_Function & fun);

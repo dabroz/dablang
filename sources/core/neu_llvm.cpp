@@ -52,7 +52,7 @@ Value * Lconstant( bool v )
 	return ConstantInt::get(Type::getInt1Ty(getGlobalContext()), v);
 }
 
-extern std::map<qString, std::vector<qneu_Function *>> functions;
+//extern std::map<qString, std::vector<qneu_Function *>> functions;
 
 extern std::vector<qDeclare*> llvmglobalvars;
 
@@ -162,7 +162,7 @@ qString RunLLVMBuilding(qValue * prog)
 		}
 	}
 
-	qneu_Function * ff = functions["main"][0];
+	qneu_Function * ff = 0;//FIXME functions["main"][0];
 	fun mainfun = (fun)TheExecutionEngine->getPointerToFunction(ff->llvmd);
 
 	qdtprintf2("Running...\n\n");

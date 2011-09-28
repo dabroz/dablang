@@ -40,8 +40,11 @@ void di_NotifyAboutType(const std::string & name, dt_BaseType * type, dab_Module
 	//qdtprintf("di_NotifyAboutType('%s')\n", name.c_str());
 	for (dab_Module::it_f it = module->_functions.begin(), end = module->_functions.end(); it != end; ++it)
 	{
-		qFunction * f = it->second.node;
-		notifyNewType(name, type, f);
+		for (unsigned i = 0; i < it->second.size(); i++)
+		{
+			qFunction * f = it->second[i].node;
+			notifyNewType(name, type, f);
+		}
 	}
 	for (dab_Module::it_t it = module->_typedefs.begin(), end = module->_typedefs.end(); it != end; ++it)
 	{

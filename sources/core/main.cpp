@@ -222,7 +222,8 @@ void dab_Module::ProcessFunctions( procfun fun )
 {
 	for (it_f it = _functions.begin(), end = _functions.end(); it != end; ++it)
 	{
-		fun(it->second);
+		for (unsigned i = 0; i < it->second.size(); i++)
+			fun(it->second[i]);
 	}
 }
 
@@ -259,6 +260,8 @@ DABCORE_API dab_Module * dab_CompileFiles(std::map<qString, qString> & files, da
 	module->ProcessFunctions(GatherVariables);
 	module->ProcessFunctions(ResolveVariables);
 	module->ProcessFunctions(CleanupVariables);
+	module->ProcessFunctions(BuildFunctions);
+	module->ProcessFunctions(ResolveTypes);
 
 	/*
 	v->gatherVariables();
@@ -322,8 +325,9 @@ void dab_Module::Append( qValue * program )
 		}
 		else if (qFunction * f = dynamic_cast<qFunction*>(v))
 		{
-			_functions[f->name] = f;
-			_functions[f->name].parent = this;
+			dab_Function ff = f;
+			ff.parent = this;
+			_functions[f->name].push_back(ff);
 		}
 	}
 

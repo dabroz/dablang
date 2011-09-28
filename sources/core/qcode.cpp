@@ -156,6 +156,8 @@ void qValue::fireError( bool error, int num, const qString & desc )
 	err.line = loc.cmp_line;
 	err.start = loc.cmp_col;
 	err.desc = desc;
+
+	qdtprintf("ERROR <%s> (%s:%d)\n", desc.c_str(), loc.cmp_file.c_str(), loc.cmp_line);
 	//TODO! compileErrors.push_back(err);
 }
 
@@ -199,10 +201,13 @@ std::string dab_Module::Dump()
 	ret += "<h2>Functions</h2>";
 	for (it_f it = _functions.begin(), end = _functions.end(); it != end; ++it)
 	{
-		dab_Function & f = it->second;
+		for (unsigned i = 0; i < it->second.size(); i++)
+		{
+			dab_Function & f = it->second[i];
 
-		ret += "<h3>" + f.node->name + "</h3>";
-		ret += "<ul>" + f.node->dumpraw() + "</ul>";
+			ret += "<h3>" + f.node->name + "</h3>";
+			ret += "<ul>" + f.node->dumpraw() + "</ul>";
+		}
 	}
 
 	return ret;
