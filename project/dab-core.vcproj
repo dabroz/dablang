@@ -243,10 +243,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\sources\core\low_update_var_refs.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\sources\core\main.cpp"
 				>
 			</File>
