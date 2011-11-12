@@ -108,6 +108,14 @@ llvm::Value * qConvert::BuildValue()
 
 qConvert::qConvert( dt_BaseType * type, qValue * val, const qString &extrainfo )
 {
+	{
+		qString type1 = "[???]", type2 = "[???]", v = "[???]";
+		if (val && val->neu_type) type1 = "`" + val->neu_type->name() + "`";
+		if (type) type2 = "`" + type->name() + "`";
+		if (val) v = "'" + val->dumprawX() + "'";
+		qdtprintf("~convert *%s* (%s -> %s) [%s]\n", extrainfo.c_str(), type1.c_str(), type2.c_str(), v.c_str());
+	}
+
 	bool forced=(extrainfo=="!!");
 
 	insert(val);

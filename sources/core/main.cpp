@@ -306,9 +306,9 @@ DABCORE_API dab_Module * dab_CompileFiles(std::map<qString, qString> & files, da
 	module->ProcessFunctions(GatherVariables);
 	module->ProcessFunctions(ResolveVariables);
 	module->ProcessFunctions(CleanupVariables);
-	module->ProcessFunctions(MoveVarsToStack);
 	module->ProcessFunctions(BuildFunctions);
 	module->ProcessFunctions(ResolveTypes);
+	module->ProcessFunctions(MoveVarsToStack);
 
 	/*
 	v->gatherVariables();
