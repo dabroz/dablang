@@ -15,6 +15,7 @@ bool ShouldWriteOutput();
 
 DABCORE_API int qdtprintf(const char * format, ...);
 DABCORE_API int qdtprintf2(const char * format, ...);
+DABCORE_API void qdterrorv(const char * format, va_list args);
 DABCORE_API void qdterror(const char * format, ...);
 
 DABCORE_API void replace_all(std::string &str, const std::string &find_what, const std::string &replace_with);
@@ -221,6 +222,8 @@ public:
 	 QQLOC loc;
 	 std::string originFile;
 	 dab_Module * the_module;
+
+	 void error(const char * format, ...);
 
 	virtual bool LLVM_build(llvm::Module * module) {return false;}
 	virtual void LLVM_prebuild(llvm::Module * module) {}
@@ -444,6 +447,8 @@ public:
 	typedef void (procfun)(dab_Function &);
 
 	void ProcessFunctions(procfun fun);
+
+	void BuildCode();
 
 };
 

@@ -110,7 +110,7 @@ std::string getFile(const char * name)
 void setFile(const char *name, const qString&body)
 {
 	FILE * f = fopen(name, "wb");
-	fwrite(body.c_str(), 1, body.length() + 1, f);
+	fwrite(body.c_str(), 1, body.length(), f);
 	fclose(f);
 }
 
@@ -227,6 +227,52 @@ void dab_Module::ProcessFunctions( procfun fun )
 	}
 }
 
+llvm::Module * g_Module = 0;
+
+llvm::Module * CreateModule();
+
+void qValue::error( const char * format, ... )
+{
+	char data[16 * 1024];
+	sprintf(data, "[%s (%s)] error: %s\n", print(0).c_str(), dumprawX().c_str(), format);
+	va_list arg;
+	va_start(arg, format);
+	qdterrorv(data, arg);
+	va_end(arg);
+}
+
+void BuildFunction(dab_Function & fun)
+{
+	if (!g_Module)
+	{
+		g_Module = CreateModule();
+	}
+	qdtprintf("Building function <%s>\n", fun.node->name.c_str());
+	fun.node->LLVM_prebuild(g_Module);
+	fun.node->LLVM_build(g_Module);
+}
+
+void dab_Module::BuildCode()
+{
+	ProcessFunctions(BuildFunction);
+
+	if (ShouldWriteOutput())
+	{
+		std::string ErrorInfo;
+		std::string Q;
+		llvm::raw_string_ostream * ff1 = new llvm::raw_string_ostream(Q);
+		llvm::AssemblyAnnotationWriter * Annotator = 0;
+		g_Module->print(*ff1, Annotator);
+
+		setFile("compile_llvm.txt",Q);
+	}
+}
+
+void MoveVarsToStack(dab_Function & fun)
+{
+	low_MoveDeclarations(fun.node);
+}
+
 DABCORE_API dab_Module * dab_CompileFiles(std::map<qString, qString> & files, dab_Module * module)
 {
 	setlocale(LC_ALL,"C");
@@ -260,6 +306,7 @@ DABCORE_API dab_Module * dab_CompileFiles(std::map<qString, qString> & files, da
 	module->ProcessFunctions(GatherVariables);
 	module->ProcessFunctions(ResolveVariables);
 	module->ProcessFunctions(CleanupVariables);
+	module->ProcessFunctions(MoveVarsToStack);
 	module->ProcessFunctions(BuildFunctions);
 	module->ProcessFunctions(ResolveTypes);
 
@@ -271,6 +318,8 @@ DABCORE_API dab_Module * dab_CompileFiles(std::map<qString, qString> & files, da
 
 	if (ShouldWriteOutput()) 
 		setFile("x3_compile.html", module->Dump());
+
+	module->BuildCode();
 
 	return module;
 }

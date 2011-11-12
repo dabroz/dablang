@@ -50,13 +50,10 @@ DABCORE_API int qdtprintf2(const char * format, ...)
 	return q;
 }
 
-DABCORE_API void qdterror(const char * format, ...)
+DABCORE_API void qdterrorv(const char * format, va_list args)
 {
 	char data[1024 * 16];
-	va_list args;
-	va_start (args, format);
 	int q = vsprintf(data, format, args);
-	va_end (args);
 
 #ifdef _WIN32
 	OutputDebugString(data);
@@ -65,6 +62,14 @@ DABCORE_API void qdterror(const char * format, ...)
 	AddDablangStatus2(data);
 
 	DebugBreak();
+}
+
+DABCORE_API void qdterror(const char * format, ...)
+{
+	va_list args;
+	va_start (args, format);
+	qdterrorv(format, args);
+	va_end (args);
 }
 
 DABCORE_API void replace_all(std::string &str, const std::string &find_what, const std::string &replace_with)

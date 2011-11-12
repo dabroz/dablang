@@ -19,7 +19,7 @@ llvm::Value * qVariable::BuildValue()
 
 	if (!var) 
 	{
-		qdterror("No llvm variable for '%s'\n", print(0).c_str());
+		error("No llvm variable");
 	}
 
 	if (dynamic_cast<qneu_ArrayType*>(neu_type))
