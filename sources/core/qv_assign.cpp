@@ -27,14 +27,14 @@ bool qAssign::LLVM_build( llvm::Module * module )
 
 	if (!v)
 	{
-		qdterror("no R for assign");
+		error("no R for assign");
 	}
 
 	ptr = L()->getLlvmVariable();
 
 	if (ptr == 0)
 	{
-		qdterror("assign PTR = 0\n");
+		error("assign PTR = 0");
 	}
 
 	Builder.CreateStore(v, ptr, false);

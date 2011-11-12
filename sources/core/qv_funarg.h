@@ -10,4 +10,6 @@ public:
 
 	qString print(int indent);
 	qString subdump() { return _argName; }
+
+	virtual llvm::Value * BuildValue();
 };

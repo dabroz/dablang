@@ -16,3 +16,8 @@ qFunctionArgument::qFunctionArgument( qFunction * fun, const qString & name )
 			neu_type = fun->L()->children[i]->neu_type;
 	}
 }
+
+llvm::Value * qFunctionArgument::BuildValue()
+{
+	return function()->VarArg("_a_"+_argName);
+}
