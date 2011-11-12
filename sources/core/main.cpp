@@ -252,6 +252,51 @@ void BuildFunction(dab_Function & fun)
 	fun.node->LLVM_build(g_Module);
 }
 
+struct qINI
+{
+	std::map<qString, qString> params;
+};
+
+qINI g_INI;
+
+void ReadIniConfig()
+{
+	qString s = getFile("dab.ini") + "\n";
+	char line[1024];
+	int p = 0;
+	qString sector;
+	for (int i = 0, l = s.length(); i < l; i++)
+	{
+		if (s[i] == '\n' && p)
+		{
+			line[p] = 0;
+			if (line[0] == '[')
+				sector = qString(line + 1, p - 3);
+			else if (line[0] == '#')
+				{}
+			else
+			{
+				const char * eq = strstr(line, "=");
+				if (eq)
+				{
+					qString key = sector + "/" + qString(line, eq - line);
+					qString value = eq + 1;
+					g_INI.params[key] = value;
+				}
+			}
+
+			p = 0;
+		}
+		else line[p++] = s[i];
+	}
+}
+void temp_compileToExe(const qString & s)
+{
+	ReadIniConfig();
+
+	setFile("__build.txt", s);
+}
+
 void dab_Module::BuildCode()
 {
 	ProcessFunctions(BuildFunction);
@@ -265,6 +310,8 @@ void dab_Module::BuildCode()
 		g_Module->print(*ff1, Annotator);
 
 		setFile("compile_llvm.txt",Q);
+
+		temp_compileToExe(Q);
 	}
 }
 
