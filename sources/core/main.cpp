@@ -267,11 +267,12 @@ void ReadIniConfig()
 	qString sector;
 	for (int i = 0, l = s.length(); i < l; i++)
 	{
+		if (s[i] == '\r') continue;
 		if (s[i] == '\n' && p)
 		{
 			line[p] = 0;
 			if (line[0] == '[')
-				sector = qString(line + 1, p - 3);
+				sector = qString(line + 1, p - 2);
 			else if (line[0] == '#')
 				{}
 			else
@@ -290,11 +291,70 @@ void ReadIniConfig()
 		else line[p++] = s[i];
 	}
 }
+#include <windows.h>
+
+void win32_run(const char * exe, const char * cmdline)
+{
+	qdtprintf("run: `%s %s`\n", exe, cmdline);
+
+	PROCESS_INFORMATION pi;
+	STARTUPINFO si;
+	memset(&pi, 0, sizeof(pi));
+	memset(&si, 0, sizeof(si));
+	si.cb = sizeof(si);
+
+	HANDLE pipew, piper;
+	BOOL res;
+
+	SECURITY_ATTRIBUTES saAttr; 
+
+	saAttr.nLength = sizeof(SECURITY_ATTRIBUTES); 
+	saAttr.bInheritHandle = TRUE; 
+	saAttr.lpSecurityDescriptor = NULL; 
+
+	res = CreatePipe(&piper, &pipew, &saAttr, 0);
+	assert(res);
+
+	SetHandleInformation(piper, HANDLE_FLAG_INHERIT, 0);
+
+	si.hStdOutput = pipew;
+	si.hStdError = pipew;
+	si.dwFlags |= STARTF_USESTDHANDLES;
+	char p[1024*16];
+	sprintf(p,"%s %s", exe, cmdline);
+	res = CreateProcess(0, p, 0, 0, 1, NORMAL_PRIORITY_CLASS, 0, 0, &si, &pi);
+	
+	if (res == 0)
+	{
+		qdtprintf("`%s %s` failed\n", exe, cmdline);
+	}
+	else
+	{
+		WaitForSingleObject(pi.hProcess, INFINITE);
+		CloseHandle(pi.hProcess);
+		CloseHandle(pi.hThread);
+	}
+
+	CloseHandle(pipew);
+	char p2[16 * 1024];
+	DWORD p3 = 666;
+	res = ReadFile(piper, p2, 16 * 1024, &p3, 0);
+	p2[p3]=0;
+	qdtprintf("%d: %s\n", p3, p3?p2:"nope");
+	CloseHandle(piper);
+}
+
 void temp_compileToExe(const qString & s)
 {
 	ReadIniConfig();
 
-	setFile("__build.txt", s);
+	setFile("__build.ll", s);
+	//win32_run(g_INI.params["tools/llvmas"].c_str(), "--help");
+	win32_run(g_INI.params["tools/llvmas"].c_str(), "__build.ll");
+	win32_run(g_INI.params["tools/llvmopt"].c_str(), "-O3 __build.bc -o __build.opt.bc");
+	win32_run(g_INI.params["tools/llvmllc"].c_str(), "__build.opt.bc");
+	win32_run(g_INI.params["tools/as"].c_str(), "__build.opt.s -o __build.o");
+	win32_run(g_INI.params["tools/ld"].c_str(), "__build.o -o __build.exe -e __f_main_");
 }
 
 void dab_Module::BuildCode()
