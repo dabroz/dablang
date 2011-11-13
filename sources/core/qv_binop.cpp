@@ -131,6 +131,8 @@ void qBinOp::subupdateType()
 	}
 }
 
+void llvm_dumpvaluetype(const char * ss,Value * v);
+
 llvm::Value * qBinOp::BuildValue()
 {
 	qString sL = L()->dumprawX();
@@ -138,6 +140,10 @@ llvm::Value * qBinOp::BuildValue()
 
 	Value * QL = L()->BuildValue(),
 		* QR = R()->BuildValue();
+
+	qdtprintf("binop:\n");
+	llvm_dumpvaluetype("L", QL);
+	llvm_dumpvaluetype("R", QR);
  
 	qString codename = name+"_"+L()->neu_type->mangle() + R()->neu_type->mangle();
 

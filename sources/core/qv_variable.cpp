@@ -14,17 +14,20 @@ llvm::Value * qVariable::BuildValue()
 	{
 		return varg;
 	}*/
+	Value * var = 0;
+
 	dab_Module::it_g it = this->the_module->_globals.find(name);
 	if (it != this->the_module->_globals.end())
 	{
-		return it->second->getLlvmVariable();
+		var = it->second->getLlvmVariable();
 	}
-
-	Value * var = getLlvmVariable();
-
-	if (!var) 
+	else
 	{
-		error("No (local) llvm variable");
+		var = getLlvmVariable();
+		if (!var) 
+		{
+			error("No (local?) llvm variable");
+		}
 	}
 
 	if (dynamic_cast<qneu_ArrayType*>(neu_type))
