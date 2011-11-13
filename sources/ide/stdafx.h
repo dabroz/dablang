@@ -28,6 +28,7 @@ namespace llvm
 	class Value;
 	class Function;
 	class Type;
+	class FunctionType;
 };
 
 #include "dab_header.h"

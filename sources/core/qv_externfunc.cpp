@@ -74,22 +74,34 @@ void * ExternForname(const qString & s, const qString & mn)
 
 void qExternFunc::LLVM_prebuild( llvm::Module * module )
 {
-	Function * F = CreateFun(module);
-	func->llvmd = F;
+	Function * F = 0;
+	bool winflag = false;
+	qString winname;
 
 	bool fromdll = false;
 	qString dllname;
 	qString dllfunname;
 	bool opengl = false;
 	
-	if (R())
+	if ( _options.size())
 	{
-		int ee = R()->size();
+		int ee = _options.size();
+		//qValueVec & vvvv = _options->children;
 		for (int i = 0; i < ee; i+=2)
 		{
-			qString par = R()->children[i]->name;
-			qString val = R()->children[i+1]->name;
+			qString par = _options[i]->name;
+			qString val = _options[i+1]->name;
+			
+			if (par == "win")
+			{
+				winflag = true;
+				winname = val;
+				if (dllfunname=="") dllfunname = name;
 
+				F = llvm::Function::Create(GetType(),  llvm::Function::ExternalLinkage, dllfunname, module);
+				InsertArgs(F);
+				F->deleteBody();
+			}
 			if (par == "call")
 			{
 				if (val == "stdcall") F->setCallingConv(CallingConv::X86_StdCall);
@@ -103,13 +115,22 @@ void qExternFunc::LLVM_prebuild( llvm::Module * module )
 			}
 			if (par == "name" )
 			{
-				dllfunname = val;				
+				dllfunname = val;	
+				F->setName(val);
 			}
 			if (par == "opengl")
 			{
 				opengl = true;
 				if (dllfunname=="") dllfunname = name;
 			}
+		}
+		if (winflag) //static import
+		{
+
+		}
+		else
+		{
+			F = CreateFun(module);
 		}
 		if (opengl)
 		{
@@ -135,6 +156,7 @@ void qExternFunc::LLVM_prebuild( llvm::Module * module )
 	{
 		TheExecutionEngine->addGlobalMapping(F, ExternForname(name, this->func->mangled_name));
 	}
+	func->llvmd = F;
 }
 
 qString qExternFunc::print( int indent )
@@ -159,7 +181,10 @@ qExternFunc::qExternFunc( qValue * options, qValue * _type, qValue * _name, qVal
 		params = new qSequence();
 	}
 
-	insert(params);
 	if (options)
-		insert(options);
+		_options = options->children;
+
+	insert(params);
+	//if (options)
+		//insert(options);
 }

@@ -10,6 +10,8 @@ public:
 	//llvm::Value * VarGlobal( qString realname );
 	llvm::Value * getVariable(qString realname);
 
+	llvm::FunctionType * GetType();
+
 	qFunction(qValue* _type, qValue* _name, qValue* _arglist, qValue* _body);
 	qString print(int indent);
 

@@ -3,6 +3,8 @@
 
 void CopyArgumentsToStack(dab_Function & fun)
 {
+	if (dynamic_cast<qExternFunc*>(fun.node)) return;
+
 	qSequence * args = (qSequence*)fun.node->L();
 	qSequence * seq = (qSequence*)fun.node->R()->L();
 	qSequence * newseq = new qSequence;

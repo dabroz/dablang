@@ -285,13 +285,19 @@ void ReadIniConfig()
 	for (int i = 0, l = s.length(); i < l; i++)
 	{
 		if (s[i] == '\r') continue;
-		if (s[i] == '\n' && p)
+		if (s[i] == '\n')
 		{
+			if (!p) continue;
 			line[p] = 0;
 			if (line[0] == '[')
+			{
 				sector = qString(line + 1, p - 2);
+				
+			}
 			else if (line[0] == '#')
-				{}
+			{
+				
+			}
 			else
 			{
 				const char * eq = strstr(line, "=");
@@ -301,6 +307,8 @@ void ReadIniConfig()
 					qString value = eq + 1;
 					g_INI.params[key] = value;
 				}
+				else
+				{}
 			}
 
 			p = 0;
@@ -371,7 +379,8 @@ void temp_compileToExe(const qString & s)
 	win32_run(g_INI.params["tools/llvmopt"].c_str(), "-O3 __build.bc -o __build.opt.bc");
 	win32_run(g_INI.params["tools/llvmllc"].c_str(), "__build.opt.bc");
 	win32_run(g_INI.params["tools/as"].c_str(), "__build.opt.s -o __build.o");
-	win32_run(g_INI.params["tools/ld"].c_str(), "-e __f_main_  -o __build.exe __build.o");
+	qString xx = "\"" + g_INI.params["lib/win"] + "user32.lib\"";
+	win32_run(g_INI.params["tools/ld"].c_str(), ("--subsystem windows -e __f_main_  -o __build.exe __build.o " + xx).c_str());
 }
 
 void dab_Module::BuildCode()

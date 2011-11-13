@@ -4,7 +4,8 @@
 
 using namespace llvm;
 
-llvm::Function * qFunction::CreateFun(Module *module)
+
+llvm::FunctionType *qFunction::GetType()
 {
 	std::vector<llvm::Type *> params;
 	bool vararg = false;
@@ -30,9 +31,12 @@ llvm::Function * qFunction::CreateFun(Module *module)
 		qdterror("No LLVM type for return %s\n", func->returntype->name().c_str());
 	}
 
-	llvm::FunctionType * ft = llvm::FunctionType::get(lt, params, vararg);
+	return llvm::FunctionType::get(lt, params, vararg);
+}
 
-	llvm::Function *F = llvm::Function::Create(ft, llvm::Function::ExternalLinkage, func->mangled_name, module);
+llvm::Function * qFunction::CreateFun(Module *module)
+{
+	llvm::Function *F = llvm::Function::Create(GetType(),  llvm::Function::ExternalLinkage, func->mangled_name, module);
 
 	InsertArgs(F);
 

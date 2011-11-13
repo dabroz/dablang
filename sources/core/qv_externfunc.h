@@ -3,6 +3,9 @@
 class qExternFunc : public qFunction
 {
 public:
+
+	qValueVec _options;
+
 	qExternFunc(qValue * options, qValue * _type, qValue * _name, qValue * params);
 	qString print(int indent);
 	virtual void LLVM_prebuild(llvm::Module * module) ;
