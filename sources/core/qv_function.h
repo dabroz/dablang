@@ -5,9 +5,9 @@ class qFunction : public qValue
 public:
 	qneu_Function * func;
 
-	llvm::Value * VarArg(qString mangledName);
+	//llvm::Value * VarArg(qString mangledName);
 	llvm::Value * VarLocal(qString mangledName);
-	llvm::Value * VarGlobal( qString realname );
+	//llvm::Value * VarGlobal( qString realname );
 	llvm::Value * getVariable(qString realname);
 
 	qFunction(qValue* _type, qValue* _name, qValue* _arglist, qValue* _body);

@@ -19,5 +19,10 @@ qFunctionArgument::qFunctionArgument( qFunction * fun, const qString & name )
 
 llvm::Value * qFunctionArgument::BuildValue()
 {
-	return function()->VarArg("_a_"+_argName);
+	for (int i = 0; i < function()->func->args.size(); i++)
+	{
+		FunctionArg fa = function()->func->args[i];
+		if (_argName == fa.name) return fa.llvmreef;
+	}
+	return 0;
 }

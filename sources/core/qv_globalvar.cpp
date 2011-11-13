@@ -26,5 +26,23 @@ void qGlobalVariable::LLVM_prebuild( llvm::Module * module )
 
 bool qGlobalVariable::LLVM_build( llvm::Module * module )
 {
+
+	llvm::Type * t = neu_type->llvm();
+
+	Constant * v = UndefValue::get(t);
+
+	if (L()) v = dynamic_cast<Constant*>(L()->BuildValue());
+
+	llvmvar = new llvm::GlobalVariable(*module, t, neu_type->is_const , 
+		neu_type->is_const ? llvm::GlobalVariable::InternalLinkage :
+		llvm::GlobalVariable::ExternalLinkage, v, name);
+
+	//llvmglobalvars.push_back(this);
+
 	return false;
+}
+
+llvm::Value * qGlobalVariable::getLlvmVariable()
+{
+	return llvmvar;
 }

@@ -445,8 +445,10 @@ public:
 	std::string Dump();
 
 	typedef void (procfun)(dab_Function &);
+	typedef void (procvar)(qGlobalVariable *);
 
 	void ProcessFunctions(procfun fun);
+	void ProcessVariables(procvar fun);
 
 	void BuildCode();
 

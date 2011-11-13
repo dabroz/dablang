@@ -49,17 +49,17 @@ bool qDeclare::LLVM_build( llvm::Module * module )
 
 void qDeclare::LLVM_prebuild( llvm::Module * module )
 {
-	llvm::Type * t = neu_type->llvm();
+	//llvm::Type * t = neu_type->llvm();
 
-	Constant * v = UndefValue::get(t);
+	//Constant * v = UndefValue::get(t);
 
-	if (L()) v = dynamic_cast<Constant*>(L()->BuildValue());
+	//if (L()) v = dynamic_cast<Constant*>(L()->BuildValue());
 
-	llvmvar = new llvm::GlobalVariable(*module, t, neu_type->is_const , 
-		neu_type->is_const ? llvm::GlobalVariable::InternalLinkage :
-		llvm::GlobalVariable::ExternalLinkage, v, name);
+	//llvmvar = new llvm::GlobalVariable(*module, t, neu_type->is_const , 
+	//	neu_type->is_const ? llvm::GlobalVariable::InternalLinkage :
+	//	llvm::GlobalVariable::ExternalLinkage, v, name);
 
-	llvmglobalvars.push_back(this);
+	//llvmglobalvars.push_back(this);
 }
 
 qDeclare::qDeclare( qValue * _type, qValue * _name, qValue * _value )

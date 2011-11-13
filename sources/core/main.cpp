@@ -107,7 +107,7 @@ std::string getFile(const char * name)
 	return ret;
 }
 
-void setFile(const char *name, const qString&body)
+DABCORE_API void setFile(const char *name, const qString&body)
 {
 	FILE * f = fopen(name, "wb");
 	fwrite(body.c_str(), 1, body.length(), f);
@@ -227,6 +227,14 @@ void dab_Module::ProcessFunctions( procfun fun )
 	}
 }
 
+void dab_Module::ProcessVariables( procvar fun )
+{
+	for (it_g it = _globals.begin(), end = _globals.end(); it != end; ++it)
+	{
+		fun(it->second);
+	}
+}
+
 llvm::Module * g_Module = 0;
 
 llvm::Module * CreateModule();
@@ -243,13 +251,22 @@ void qValue::error( const char * format, ... )
 
 void BuildFunction(dab_Function & fun)
 {
-	if (!g_Module)
-	{
-		g_Module = CreateModule();
-	}
 	qdtprintf("Building function <%s>\n", fun.node->name.c_str());
-	fun.node->LLVM_prebuild(g_Module);
+	//fun.node->LLVM_prebuild(g_Module);
 	fun.node->LLVM_build(g_Module);
+}
+
+void BuildVariable(qGlobalVariable *var)
+{
+	qdtprintf("Building var <%s>\n", var->name.c_str());
+	var->LLVM_build(g_Module);
+}
+
+void PreBuildFunction(dab_Function & fun)
+{
+	qdtprintf("Prebuilding function <%s>\n", fun.node->name.c_str());
+	fun.node->LLVM_prebuild(g_Module);
+	//fun.node->LLVM_build(g_Module);
 }
 
 struct qINI
@@ -354,11 +371,18 @@ void temp_compileToExe(const qString & s)
 	win32_run(g_INI.params["tools/llvmopt"].c_str(), "-O3 __build.bc -o __build.opt.bc");
 	win32_run(g_INI.params["tools/llvmllc"].c_str(), "__build.opt.bc");
 	win32_run(g_INI.params["tools/as"].c_str(), "__build.opt.s -o __build.o");
-	win32_run(g_INI.params["tools/ld"].c_str(), "__build.o -o __build.exe -e __f_main_");
+	win32_run(g_INI.params["tools/ld"].c_str(), "-e __f_main_  -o __build.exe __build.o");
 }
 
 void dab_Module::BuildCode()
 {
+	if (!g_Module)
+	{
+		g_Module = CreateModule();
+	}
+
+	ProcessVariables(BuildVariable);
+	ProcessFunctions(PreBuildFunction);
 	ProcessFunctions(BuildFunction);
 
 	if (ShouldWriteOutput())

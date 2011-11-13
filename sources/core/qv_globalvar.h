@@ -14,4 +14,6 @@ public:
 
 	virtual void LLVM_prebuild(llvm::Module * module);
 	virtual bool LLVM_build(llvm::Module * module) ;
+
+	virtual llvm::Value * getLlvmVariable();
 };

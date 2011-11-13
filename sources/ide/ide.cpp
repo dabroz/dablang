@@ -160,10 +160,7 @@ enum
 	ID_MENUUPDATE
 };
 
-void setFile(const char *name, const qString&body)
-{
-	// PLACEHOLDER
-}
+DABCORE_API void setFile(const char *name, const qString&body);
 
 bool runCode(qValue * prog)
 {
