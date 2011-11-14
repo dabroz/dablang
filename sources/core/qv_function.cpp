@@ -43,13 +43,13 @@ llvm::Function * qFunction::CreateFun(Module *module)
 	return F;
 }
 
-extern std::map<qString, Function*> very_raw_funcs;
+//extern std::map<qString, Function*> very_raw_funcs;
 
 void qFunction::LLVM_prebuild( llvm::Module * module )
 {
 	qdtprintf2("Prebuilding fun `%s`\n", this->name.c_str());
 
-	Function * F = very_raw_funcs[this->func->mangled_name];
+	Function * F = 0;//very_raw_funcs[this->func->mangled_name];
 		
 	if (F)
 	{
@@ -89,7 +89,7 @@ bool qFunction::LLVM_build( llvm::Module * module )
 		}
 	}
 
-	very_raw_funcs[this->func->mangled_name] = func->llvmd;
+//	very_raw_funcs[this->func->mangled_name] = func->llvmd;
 
 	return false;
 }

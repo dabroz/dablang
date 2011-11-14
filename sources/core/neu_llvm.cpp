@@ -6,13 +6,21 @@ ExecutionEngine *TheExecutionEngine = 0;
 
 llvm::Module * CreateModule()
 {
+	static bool init = false;
+	if (!init)
+	{
+		init = true;
+		llvm_start_multithreaded();
+	}
+
 	llvm::InitializeNativeTarget();
 	
+	//llvm::LLVMContext &Context = *(new LLVMContext);
 	llvm::LLVMContext &Context = llvm::getGlobalContext();
-	llvm::Module * mod = new llvm::Module("QDT Jit", Context);
+	char name[128];
+	sprintf(name, "QDT JIT %d", rand());
+	llvm::Module * mod = new llvm::Module(name, Context);
 	std::string ErrStr;
-	
-	llvm_start_multithreaded();
 
 	llvm::UnsafeFPMath = true;
 	llvm::NoInfsFPMath = true;
@@ -27,12 +35,12 @@ llvm::Module * CreateModule()
 		setOptLevel(CodeGenOpt::None).
 		setEngineKind(EngineKind::JIT).		
 		create();
-		if (!TheExecutionEngine) {
-			fprintf(stderr, "Could not create ExecutionEngine: %s\n", ErrStr.c_str());
-			exit(1);
-		}
+	if (!TheExecutionEngine) {
+		fprintf(stderr, "Could not create ExecutionEngine: %s\n", ErrStr.c_str());
+		exit(1);
+	}
 
-		TheExecutionEngine->DisableLazyCompilation(true);
+	TheExecutionEngine->DisableLazyCompilation(true);
 
 	return mod;
 }

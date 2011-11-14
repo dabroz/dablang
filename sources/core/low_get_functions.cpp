@@ -28,12 +28,12 @@ void notifyNewFunc(qString name, qneu_Function * f, qValue * tree )
 
 //std::map<qString, std::vector<qneu_Function *>> functions;
 
-std::map<qString, Function*> very_raw_funcs;
+//std::map<qString, Function*> very_raw_funcs;
 
 void ResetFunctions()
 {
 	//functions.clear();
-	very_raw_funcs.clear();
+	//very_raw_funcs.clear();
 }
 
 bool qneu_Function::isvararg() const { 

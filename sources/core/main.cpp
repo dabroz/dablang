@@ -386,7 +386,8 @@ void temp_compileToExe(const qString & s)
 
 void dab_Module::BuildCode()
 {
-	if (!g_Module)
+	if (g_Module) { delete g_Module; g_Module = 0; }
+	//if (!g_Module)
 	{
 		g_Module = CreateModule();
 	}
@@ -417,6 +418,7 @@ void MoveVarsToStack(dab_Function & fun)
 DABCORE_API dab_Module * dab_CompileFiles(std::map<qString, qString> & files, dab_Module * module)
 {
 	setlocale(LC_ALL,"C");
+	if (module) { delete module; module = 0; }
 	if (!module) module = new dab_Module;
 	if (files.size() == 0) return module;
 
