@@ -34,6 +34,8 @@ bool qAssign::LLVM_build( llvm::Module * module )
 
 	if (ptr == 0)
 	{
+		qValue * qqq=L();
+		qqq->getLlvmVariable();
 		error("assign PTR = 0");
 	}
 

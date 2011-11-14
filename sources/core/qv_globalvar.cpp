@@ -37,6 +37,8 @@ bool qGlobalVariable::LLVM_build( llvm::Module * module )
 		neu_type->is_const ? llvm::GlobalVariable::InternalLinkage :
 		llvm::GlobalVariable::ExternalLinkage, v, name);
 
+	qdtprintf("EMITED GLOBAL `%s` const %d\n", name.c_str(), neu_type->is_const);
+
 	//llvmglobalvars.push_back(this);
 
 	return false;

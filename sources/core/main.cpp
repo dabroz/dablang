@@ -376,7 +376,8 @@ void temp_compileToExe(const qString & s)
 	setFile("__build.ll", s);
 	//win32_run(g_INI.params["tools/llvmas"].c_str(), "--help");
 	win32_run(g_INI.params["tools/llvmas"].c_str(), "__build.ll");
-	win32_run(g_INI.params["tools/llvmopt"].c_str(), "-O3 __build.bc -o __build.opt.bc");
+	win32_run(g_INI.params["tools/llvmopt"].c_str(), "-O3 -S __build.bc -o __build.opt.ll");
+	win32_run(g_INI.params["tools/llvmas"].c_str(), "__build.opt.ll");
 	win32_run(g_INI.params["tools/llvmllc"].c_str(), "__build.opt.bc");
 	win32_run(g_INI.params["tools/as"].c_str(), "__build.opt.s -o __build.o");
 	qString xx = "\"" + g_INI.params["lib/win"] + "user32.lib\"";

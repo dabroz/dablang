@@ -270,6 +270,7 @@ bool qValue::is_parent(qValue * v)
 qValue::qValue() : neu_type(0), parent((qValue*)0)
 {
 	loc.cmp_pos=-1;
+	the_module = 0;
 };
 
 void qValue::updateChildren()
@@ -277,6 +278,7 @@ void qValue::updateChildren()
 	for (size_t i = 0, e = size(); i < e; i++)
 	{
 		children[i]->parent = this;
+		children[i]->the_module = the_module;
 		children[i]->updateChildren();
 	}
 }
