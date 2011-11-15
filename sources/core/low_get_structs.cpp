@@ -46,6 +46,10 @@ void di_NotifyAboutType(const std::string & name, dt_BaseType * type, dab_Module
 			notifyNewType(name, type, f);
 		}
 	}
+	for (dab_Module::it_g it = module->_globals.begin(), end = module->_globals.end(); it != end; ++it)
+	{
+		notifyNewType(name, type, it->second);
+	}
 	for (dab_Module::it_t it = module->_typedefs.begin(), end = module->_typedefs.end(); it != end; ++it)
 	{
 		notifyNewType(name, type, it->second.node);

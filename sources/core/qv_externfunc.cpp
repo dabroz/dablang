@@ -86,6 +86,7 @@ void qExternFunc::LLVM_prebuild( llvm::Module * module )
 	if ( _options.size())
 	{
 		int ee = _options.size();
+		qString callcv = "";
 		//qValueVec & vvvv = _options->children;
 		for (int i = 0; i < ee; i+=2)
 		{
@@ -104,8 +105,7 @@ void qExternFunc::LLVM_prebuild( llvm::Module * module )
 			}
 			if (par == "call")
 			{
-				if (val == "stdcall") F->setCallingConv(CallingConv::X86_StdCall);
-				if (val == "cdecl") F->setCallingConv(CallingConv::C);
+				callcv = val;
 			}
 			if (par == "dll")
 			{
@@ -116,7 +116,6 @@ void qExternFunc::LLVM_prebuild( llvm::Module * module )
 			if (par == "name" )
 			{
 				dllfunname = val;	
-				F->setName(val);
 			}
 			if (par == "opengl")
 			{
@@ -132,6 +131,9 @@ void qExternFunc::LLVM_prebuild( llvm::Module * module )
 		{
 			F = CreateFun(module);
 		}
+		if (callcv == "stdcall") F->setCallingConv(CallingConv::X86_StdCall);
+		if (callcv == "cdecl") F->setCallingConv(CallingConv::C);
+		F->setName(dllfunname);
 		if (opengl)
 		{
 			glcalls[dllfunname] = F;
