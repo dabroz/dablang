@@ -32,10 +32,18 @@ Value * qFuncall::CreateSubvalue(bool named)
 	}
 
 	CallInst * ci = 0;
+
+	Value * callee = func->llvmd;
+
+	if (!dynamic_cast<Function*>(callee))
+	{
+		callee = Builder.CreateLoad(callee);
+	}
+
 	if (args.size()) 
-		ci = Builder.CreateCall(func->llvmd, llvm::ArrayRef<Value*>(args), named?name:"");
+		ci = Builder.CreateCall(callee, llvm::ArrayRef<Value*>(args), named?name:"");
 	else
-		ci = Builder.CreateCall(func->llvmd, named?name:"");
+		ci = Builder.CreateCall(callee, named?name:"");
 
 	ci->setCallingConv(func->llvmd->getCallingConv());
 

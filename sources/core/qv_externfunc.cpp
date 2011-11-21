@@ -82,6 +82,8 @@ void qExternFunc::LLVM_prebuild( llvm::Module * module )
 	qString dllname;
 	qString dllfunname;
 	//bool opengl = false;
+	GlobalVariable * FP = 0;
+
 	/*
 	if ( _options.size())
 	{*/
@@ -124,6 +126,19 @@ void qExternFunc::LLVM_prebuild( llvm::Module * module )
 		{
 
 		}
+		else if (_options.count("attrib"))
+		{
+			FP= new llvm::GlobalVariable(*module, 
+				
+				PointerType::getUnqual(GetType()),
+				
+			false, llvm::GlobalVariable::ExternalLinkage, 0, func->mangled_name);
+			//llvm::Function *F = llvm::Function::Create(GetType(),  llvm::Function::ExternalLinkage, func->mangled_name, module);
+
+			//InsertArgs(F);
+
+			//F = FP;
+		}
 		else
 		{
 			F = CreateFun(module);
@@ -150,9 +165,12 @@ void qExternFunc::LLVM_prebuild( llvm::Module * module )
 			qString cc = val->children[0]->name; // todo: handle errors
 		}
 
-		if (callcv == "stdcall") F->setCallingConv(CallingConv::X86_StdCall);
-		if (callcv == "cdecl") F->setCallingConv(CallingConv::C);
-		F->setName(dllfunname);
+		if (F)
+		{
+			if (callcv == "stdcall") F->setCallingConv(CallingConv::X86_StdCall);
+			if (callcv == "cdecl") F->setCallingConv(CallingConv::C);
+			F->setName(dllfunname);
+		}
 
 
 		if (fromdll)
@@ -170,6 +188,7 @@ void qExternFunc::LLVM_prebuild( llvm::Module * module )
 		TheExecutionEngine->addGlobalMapping(F, ExternForname(name, this->func->mangled_name));
 	}*/
 	func->llvmd = F;
+	if (FP)  func->llvmd  = (Function*)FP;
 }
 
 qString qExternFunc::print( int indent )
