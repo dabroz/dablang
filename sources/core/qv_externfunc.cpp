@@ -173,7 +173,7 @@ qString qExternFunc::print( int indent )
 	return ret;
 }
 
-qExternFunc::qExternFunc( qValue * options, qValue * _type, qValue * _name, qValue * params )
+qExternFunc::qExternFunc( qValue * options, qValue * _type, qValue * _name, qValue * params, int shortversion )
 {
 	this->neu_type = _type->neu_type;
 	this->name = _name->name;
@@ -185,6 +185,11 @@ qExternFunc::qExternFunc( qValue * options, qValue * _type, qValue * _name, qVal
 
 	if (options)
 		_options = options->children;
+
+	if (shortversion)
+	{
+		_options = qtree_seq_append(qtree_seq_start(qtree_id("attrib")), options)->children;
+	}
 
 	insert(params);
 	//if (options)

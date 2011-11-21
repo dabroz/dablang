@@ -78,7 +78,8 @@ program
 definition
 	: type NAME ';' 												{ $$ = QCODEY($2, qtree_globalvar($1, $2, 0)); }
 	| type NAME '=' constant ';' 									{ $$ = QCODEY($2, qtree_globalvar($1, $2, $4)); }	
-	| EXTERN optionaalearglist type NAME '(' arglistnull ')' ';'	{ $$ = QCODEY($4, new qExternFunc($2, $3, $4, $6)); }		
+	| EXTERN optionaalearglist type NAME '(' arglistnull ')' ';'	{ $$ = QCODEY($4, new qExternFunc($2, $3, $4, $6)); }
+	| '[' NAME ']' type NAME '(' arglistnull ')' ';'				{ $$ = QCODEY($4, new qExternFunc($2, $4, $5, $7, 1)); }
 	| type NAME '(' arglistnull ')' block 							{ $$ = QCODEY($2, qtree_function($1, $2, $4, $6)); }
 	| STRUCT NAME '{' strmember '}' ';'								{ $$ = QCODEY($2, qtree_struct($2, $4)); }
 	| TYPEDEF type NAME ';'											{ $$ = QCODEY($3, new qTypedef($3, $2)); }
