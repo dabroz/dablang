@@ -4,7 +4,8 @@ class qExternFunc : public qFunction
 {
 public:
 
-	qValueVec _options;
+	std::map<qString, qString> _options;
+	//qValueVec _options;
 
 	qExternFunc(qValue * options, qValue * _type, qValue * _name, qValue * params, int shortversion = 0);
 	qString print(int indent);

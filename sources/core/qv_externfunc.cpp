@@ -4,55 +4,55 @@
 
 extern ExecutionEngine *TheExecutionEngine ;
 
-#pragma pack (push)
-#pragma pack (1)
-struct JMPI
-{
-	unsigned char moveax;
-	unsigned addr;
-	unsigned char jmp;
-	unsigned char eax;
-};
-#pragma pack (pop)
-
-std::map<qString, Function *> glcalls;
-std::map<qString, JMPI *> glcalls2;
-
-void breakx()
-{
-	__asm { int 3 }
-}
-
-void LoadDeferredOpenGLFunctions();
-
-
-void LoadDeferredOpenGLFunctions()
-{
-	for (std::map<qString, Function *>::iterator it = glcalls.begin(), end = glcalls.end(); it != end; ++it)
-	{
-		Function * F = it->second;
-		const qString & fn = it->first;
-
-		HMODULE hm = LoadLibrary("opengl32.dll");
-		void * funp = GetProcAddress(hm, "wglGetProcAddress");
-
-		typedef  void * (__stdcall *procfun)(const char * n);
-
-		procfun getfun = (procfun)funp;
-
-		void * ff = getfun(fn.c_str());
-
-		qdtprintf2("LOAD OPENGL %08x %08x %08x <%s> \n", 
-			(unsigned)hm, (unsigned)getfun, (unsigned)ff, fn.c_str());
-
-		JMPI * pp = glcalls2[it->first];
-
-		pp->moveax = 0xB8;
-		pp->addr = (unsigned)ff;
-		pp->jmp = 0xFF;
-		pp->eax = 0xE0;
-	}
-}
+//#pragma pack (push)
+//#pragma pack (1)
+//struct JMPI
+//{
+//	unsigned char moveax;
+//	unsigned addr;
+//	unsigned char jmp;
+//	unsigned char eax;
+//};
+//#pragma pack (pop)
+//
+//std::map<qString, Function *> glcalls;
+//std::map<qString, JMPI *> glcalls2;
+//
+//void breakx()
+//{
+//	__asm { int 3 }
+//}
+//
+//void LoadDeferredOpenGLFunctions();
+//
+//
+//void LoadDeferredOpenGLFunctions()
+//{
+//	for (std::map<qString, Function *>::iterator it = glcalls.begin(), end = glcalls.end(); it != end; ++it)
+//	{
+//		Function * F = it->second;
+//		const qString & fn = it->first;
+//
+//		HMODULE hm = LoadLibrary("opengl32.dll");
+//		void * funp = GetProcAddress(hm, "wglGetProcAddress");
+//
+//		typedef  void * (__stdcall *procfun)(const char * n);
+//
+//		procfun getfun = (procfun)funp;
+//
+//		void * ff = getfun(fn.c_str());
+//
+//		qdtprintf2("LOAD OPENGL %08x %08x %08x <%s> \n", 
+//			(unsigned)hm, (unsigned)getfun, (unsigned)ff, fn.c_str());
+//
+//		JMPI * pp = glcalls2[it->first];
+//
+//		pp->moveax = 0xB8;
+//		pp->addr = (unsigned)ff;
+//		pp->jmp = 0xFF;
+//		pp->eax = 0xE0;
+//	}
+//}
 
 
 void * ExternForname(const qString & s, const qString & mn)
@@ -61,8 +61,8 @@ void * ExternForname(const qString & s, const qString & mn)
 
 	funs["_f_printf_sv"] = (void*)qdtprintf2;
 	funs["_f_sprintf_pu1sv"] = sprintf;
-	funs["_f_load_gl_func_"] = LoadDeferredOpenGLFunctions;
-	funs["_f_breakx_"] = breakx;
+//	funs["_f_load_gl_func_"] = LoadDeferredOpenGLFunctions;
+//	funs["_f_breakx_"] = breakx;
 
 	if (funs.count(mn))
 	{
@@ -81,48 +81,44 @@ void qExternFunc::LLVM_prebuild( llvm::Module * module )
 	bool fromdll = false;
 	qString dllname;
 	qString dllfunname;
-	bool opengl = false;
+	//bool opengl = false;
 	
 	if ( _options.size())
 	{
 		int ee = _options.size();
 		qString callcv = "";
 		//qValueVec & vvvv = _options->children;
-		for (int i = 0; i < ee; i+=2)
-		{
-			qString par = _options[i]->name;
-			qString val = _options[i+1]->name;
-			
-			if (par == "win")
+	
+			if ( _options.count("win"))
 			{
 				winflag = true;
-				winname = val;
+				winname =  _options["win"];
 				if (dllfunname=="") dllfunname = name;
 
 				F = llvm::Function::Create(GetType(),  llvm::Function::ExternalLinkage, dllfunname, module);
 				InsertArgs(F);
 				F->deleteBody();
 			}
-			if (par == "call")
+			if (_options.count("call"))
 			{
-				callcv = val;
+				callcv = _options["call"];
 			}
-			if (par == "dll")
+			if (_options.count("dll"))
 			{
-				dllname = val;
+				dllname = _options["dll"];
 				fromdll = true;
 				if (dllfunname=="") dllfunname = name;
 			}
-			if (par == "name" )
+			if (_options.count("name"))
 			{
-				dllfunname = val;	
+				dllfunname = _options["name"];
 			}
-			if (par == "opengl")
+			/*if (par == "opengl")
 			{
 				opengl = true;
 				if (dllfunname=="") dllfunname = name;
-			}
-		}
+			}*/
+		
 		if (winflag) //static import
 		{
 
@@ -134,7 +130,7 @@ void qExternFunc::LLVM_prebuild( llvm::Module * module )
 		if (callcv == "stdcall") F->setCallingConv(CallingConv::X86_StdCall);
 		if (callcv == "cdecl") F->setCallingConv(CallingConv::C);
 		F->setName(dllfunname);
-		if (opengl)
+		/*if (opengl)
 		{
 			glcalls[dllfunname] = F;
 
@@ -143,7 +139,7 @@ void qExternFunc::LLVM_prebuild( llvm::Module * module )
 			glcalls2[dllfunname] = (JMPI*)funstub;
 
 			TheExecutionEngine->addGlobalMapping(F, funstub);
-		}
+		}*/
 		if (fromdll)
 		{
 			HMODULE hm = LoadLibrary(dllname.c_str());
@@ -183,15 +179,24 @@ qExternFunc::qExternFunc( qValue * options, qValue * _type, qValue * _name, qVal
 		params = new qSequence();
 	}
 
-	if (options)
-		_options = options->children;
-
 	if (shortversion)
 	{
-		_options = qtree_seq_append(qtree_seq_start(qtree_id("attrib")), options)->children;
+		_options["attrib"] = options->name;
+	}
+	else if (options)
+	{
+		if (options->size() % 2) { /* todo error */ }
+		else
+		{			
+			for (int i = 0; i < options->size(); i+=2)
+			{
+				qString par = (*options)[i]->name;
+				qString val = (*options)[i+1]->name;
+
+				_options[par] = val;
+			}
+		}
 	}
 
 	insert(params);
-	//if (options)
-		//insert(options);
 }
