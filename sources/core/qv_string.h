@@ -3,7 +3,7 @@
 class qStringConstant : public qValue
 {
 public:
-	qStringConstant(const char * str);
+	qStringConstant(const char * str , bool raw=false);
 	qString print(int indent)
 	{
 		qString vv = name;

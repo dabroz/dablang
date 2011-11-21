@@ -15,27 +15,30 @@ llvm::Value * qStringConstant::BuildValue()
 	return Builder.CreateBitCast(v, Type::getInt8PtrTy(getGlobalContext()), "cstrv");
 }
 
-qStringConstant::qStringConstant( const char * str )
+qStringConstant::qStringConstant( const char * str , bool raw)
 {
 	name = qString(str);
-	name = name.substr(1, name.length() - 2);
 	neu_type = qneu_CStringType::get();
-
-	qString qq = "";
-	for (int i = 0, e = name.length(); i < e; i++)
+	if (!raw)
 	{
-		if (name[i] == '\\') 
+		name = name.substr(1, name.length() - 2);
+
+		qString qq = "";
+		for (int i = 0, e = name.length(); i < e; i++)
 		{
-			char Q = name[++i];
+			if (name[i] == '\\') 
+			{
+				char Q = name[++i];
 
-			if (Q == 'n') qq += '\n';
-			else if (Q == '\\') qq += '\\';
-			else if (Q == '\r') qq += '\r';
-			else{
-				*(int*)0 = 0;
-			}
+				if (Q == 'n') qq += '\n';
+				else if (Q == '\\') qq += '\\';
+				else if (Q == '\r') qq += '\r';
+				else{
+					*(int*)0 = 0;
+				}
 
-		} else qq+=name[i];
+			} else qq+=name[i];
+		}
+		name = qq;
 	}
-	name = qq;
 }

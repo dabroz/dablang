@@ -385,18 +385,21 @@ void temp_compileToExe(const qString & s)
 	win32_run(g_INI.params["tools/llvmas"].c_str(), "__build.opt.ll");
 	win32_run(g_INI.params["tools/llvmllc"].c_str(), "__build.opt.bc");
 	win32_run(g_INI.params["tools/as"].c_str(), "__build.opt.s -o __build.o");
-	qString xx = "\"" + g_INI.params["lib/win"] + "user32.lib\"";
+	qString xx = "";
+	xx += " \"" + g_INI.params["lib/win"] + "user32.lib\" ";
+	xx += " \"" + g_INI.params["lib/win"] + "kernel32.lib\" ";
+	xx += " \"" + g_INI.params["lib/win"] + "opengl32.lib\" ";
 	win32_run(g_INI.params["tools/ld"].c_str(), ("--subsystem windows -e __f_main_  -o __build.exe __build.o " + xx).c_str());
 }
 
 void dab_Module::AddLoader( const qString & loader, qExternFunc* fun, Function * F ) 
 {
-	BasicBlock & BB = preloader->getEntryBlock();// BasicBlock::Create(getGlobalContext(), fun->name, preloader);
+	BasicBlock & BB = preloader->getEntryBlock();
 	Builder.SetInsertPoint(&BB);
 
 	Value * p = Builder.CreateCast(Instruction::CastOps::BitCast, F, qneu_PrimitiveType::consttype_uint8()->createPointer()->createPointer()->llvm(), "xxx");
 
-	Value * fname = (new qStringConstant(fun->name.c_str()))->BuildValue();
+	Value * fname = (new qStringConstant(fun->name.c_str(),true))->BuildValue();
 
 	Function * loadfun = (Function*)this->_functions[loader][0].node->func->llvmd;
 

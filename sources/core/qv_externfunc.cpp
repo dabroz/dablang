@@ -94,6 +94,7 @@ void qExternFunc::LLVM_prebuild( llvm::Module * module )
 				winflag = true;
 				winname =  _options["win"];
 				if (dllfunname=="") dllfunname = name;
+				callcv = "stdcall";
 
 				F = llvm::Function::Create(GetType(),  llvm::Function::ExternalLinkage, dllfunname, module);
 				InsertArgs(F);
