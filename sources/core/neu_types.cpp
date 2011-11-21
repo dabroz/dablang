@@ -97,11 +97,6 @@ llvm::Type * qneu_StructType::llvm()
 	return t;
 }
 
-llvm::Type * qneu_VoidType::llvm()
-{
-	return llvm::Type::getVoidTy(llvm::getGlobalContext());
-}
-
 dt_BaseType * qneu_StructType::GetTypeFor(qString membname) 
 {
 	for (int i =0;i<members.size();i++) 

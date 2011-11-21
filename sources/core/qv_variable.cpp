@@ -3,16 +3,15 @@
 #include "dab_internal.h"
 
 Value * qVariable::getLlvmVariable()
-{
-	Value * var = 0;
+{	
+	Value * v =  function()->getVariable(realname);
+	if (v) return v;
 
 	dab_Module::it_g it = this->the_module->_globals.find(name);
 	if (it != this->the_module->_globals.end())
 	{
 		return it->second->getLlvmVariable();
 	}
-	
-	return function()->getVariable(realname);
 }
 
 llvm::Value * qVariable::BuildValue()

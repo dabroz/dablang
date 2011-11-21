@@ -21,12 +21,10 @@ void qGlobalVariable::gatherVariables()
 
 void qGlobalVariable::LLVM_prebuild( llvm::Module * module )
 {
-
 }
 
 bool qGlobalVariable::LLVM_build( llvm::Module * module )
 {
-
 	llvm::Type * t = neu_type->llvm();
 
 	Constant * v = UndefValue::get(t);
@@ -38,8 +36,6 @@ bool qGlobalVariable::LLVM_build( llvm::Module * module )
 		llvm::GlobalVariable::ExternalLinkage, v, name);
 
 	qdtprintf("EMITED GLOBAL `%s` const %d\n", name.c_str(), neu_type->is_const);
-
-	//llvmglobalvars.push_back(this);
 
 	return false;
 }

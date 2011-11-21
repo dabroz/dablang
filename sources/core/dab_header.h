@@ -452,6 +452,11 @@ public:
 
 	void BuildCode();
 
+	qString PrintModule();
+
+	void AddLoader( const qString & loader, qExternFunc* fun, llvm::Function * F ) ;
+
+	llvm::Function * preloader;
 };
 
 DABCORE_API dab_Module * dab_CompileFiles(std::map<qString, qString> & files, dab_Module * origin);

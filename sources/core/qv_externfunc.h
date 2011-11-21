@@ -10,6 +10,6 @@ public:
 	qExternFunc(qValue * options, qValue * _type, qValue * _name, qValue * params, int shortversion = 0);
 	qString print(int indent);
 	virtual void LLVM_prebuild(llvm::Module * module) ;
-	bool LLVM_build( llvm::Module * module ){return false;}
+	bool LLVM_build( llvm::Module * module );
 	virtual void LLVM_update() {}
 };

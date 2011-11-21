@@ -53,24 +53,24 @@ extern ExecutionEngine *TheExecutionEngine ;
 //		pp->eax = 0xE0;
 //	}
 //}
-
-
-void * ExternForname(const qString & s, const qString & mn)
-{
-	std::map<qString, void *> funs;
-
-	funs["_f_printf_sv"] = (void*)qdtprintf2;
-	funs["_f_sprintf_pu1sv"] = sprintf;
-//	funs["_f_load_gl_func_"] = LoadDeferredOpenGLFunctions;
-//	funs["_f_breakx_"] = breakx;
-
-	if (funs.count(mn))
-	{
-		return funs[mn];
-	}
-
-	return 0;
-}
+//
+//
+//void * ExternForname(const qString & s, const qString & mn)
+//{
+//	std::map<qString, void *> funs;
+//
+//	funs["_f_printf_sv"] = (void*)qdtprintf2;
+//	funs["_f_sprintf_pu1sv"] = sprintf;
+////	funs["_f_load_gl_func_"] = LoadDeferredOpenGLFunctions;
+////	funs["_f_breakx_"] = breakx;
+//
+//	if (funs.count(mn))
+//	{
+//		return funs[mn];
+//	}
+//
+//	return 0;
+//}
 
 void qExternFunc::LLVM_prebuild( llvm::Module * module )
 {
@@ -82,9 +82,9 @@ void qExternFunc::LLVM_prebuild( llvm::Module * module )
 	qString dllname;
 	qString dllfunname;
 	//bool opengl = false;
-	
+	/*
 	if ( _options.size())
-	{
+	{*/
 		int ee = _options.size();
 		qString callcv = "";
 		//qValueVec & vvvv = _options->children;
@@ -127,9 +127,6 @@ void qExternFunc::LLVM_prebuild( llvm::Module * module )
 		{
 			F = CreateFun(module);
 		}
-		if (callcv == "stdcall") F->setCallingConv(CallingConv::X86_StdCall);
-		if (callcv == "cdecl") F->setCallingConv(CallingConv::C);
-		F->setName(dllfunname);
 		/*if (opengl)
 		{
 			glcalls[dllfunname] = F;
@@ -140,6 +137,23 @@ void qExternFunc::LLVM_prebuild( llvm::Module * module )
 
 			TheExecutionEngine->addGlobalMapping(F, funstub);
 		}*/
+
+		if (_options.count("attrib"))
+		{
+			qString attrib = _options["attrib"];
+
+			qString ccfuncname = "loader_" + attrib + "_cc";
+
+			qGlobalVariable * val = the_module->_globals[ccfuncname];
+
+			qString cc = val->children[0]->name; // todo: handle errors
+		}
+
+		if (callcv == "stdcall") F->setCallingConv(CallingConv::X86_StdCall);
+		if (callcv == "cdecl") F->setCallingConv(CallingConv::C);
+		F->setName(dllfunname);
+
+
 		if (fromdll)
 		{
 			HMODULE hm = LoadLibrary(dllname.c_str());
@@ -149,11 +163,11 @@ void qExternFunc::LLVM_prebuild( llvm::Module * module )
 				(unsigned)hm, (unsigned)funp, dllname.c_str(), dllfunname.c_str());
 			TheExecutionEngine->addGlobalMapping(F, funp);
 		}
-	}
-	else
+	/*}*/
+	/*else
 	{
 		TheExecutionEngine->addGlobalMapping(F, ExternForname(name, this->func->mangled_name));
-	}
+	}*/
 	func->llvmd = F;
 }
 
@@ -199,4 +213,13 @@ qExternFunc::qExternFunc( qValue * options, qValue * _type, qValue * _name, qVal
 	}
 
 	insert(params);
+}
+
+bool qExternFunc::LLVM_build( llvm::Module * module )
+{
+	if (_options.count("attrib"))
+	{
+		the_module->AddLoader("loader_" + _options["attrib"], this, func->llvmd);
+	}
+	return false;
 }

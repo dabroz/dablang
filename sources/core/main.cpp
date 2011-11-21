@@ -384,13 +384,31 @@ void temp_compileToExe(const qString & s)
 	win32_run(g_INI.params["tools/ld"].c_str(), ("--subsystem windows -e __f_main_  -o __build.exe __build.o " + xx).c_str());
 }
 
+void dab_Module::AddLoader( const qString & loader, qExternFunc* fun, Function * F ) 
+{
+	BasicBlock *BB = BasicBlock::Create(getGlobalContext(), fun->name, preloader);
+	Builder.SetInsertPoint(BB);
+
+	Builder.CreateCast(Instruction::CastOps::BitCast, F, qneu_PrimitiveType::consttype_uint8()->createPointer()->llvm(), "xxx");
+
+
+	std::string Q=PrintModule();
+
+	setFile("compile_llvm.txt",Q);
+}
+
 void dab_Module::BuildCode()
 {
+	preloader = 0;
+
 	if (g_Module) { delete g_Module; g_Module = 0; }
 	//if (!g_Module)
 	{
 		g_Module = CreateModule();
 	}
+
+	std::vector<Type *> x;
+	preloader = Function::Create(FunctionType::get(llvm::Type::getVoidTy(llvm::getGlobalContext()), x, false), llvm::Function::ExternalLinkage, "!dab_init", g_Module);
 
 	ProcessVariables(BuildVariable);
 	ProcessFunctions(PreBuildFunction);
@@ -398,16 +416,22 @@ void dab_Module::BuildCode()
 
 	if (ShouldWriteOutput())
 	{
-		std::string ErrorInfo;
-		std::string Q;
-		llvm::raw_string_ostream * ff1 = new llvm::raw_string_ostream(Q);
-		llvm::AssemblyAnnotationWriter * Annotator = 0;
-		g_Module->print(*ff1, Annotator);
+		std::string Q=PrintModule();
 
 		setFile("compile_llvm.txt",Q);
 
 		temp_compileToExe(Q);
 	}
+}
+
+qString dab_Module::PrintModule()
+{
+	qString Q;
+	std::string ErrorInfo;
+	llvm::raw_string_ostream * ff1 = new llvm::raw_string_ostream(Q);
+	llvm::AssemblyAnnotationWriter * Annotator = 0;
+	g_Module->print(*ff1, Annotator);
+	return Q;
 }
 
 void MoveVarsToStack(dab_Function & fun)

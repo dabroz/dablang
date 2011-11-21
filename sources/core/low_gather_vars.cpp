@@ -8,16 +8,13 @@ void GatherVariables(dab_Function & fun)
 
 static void updateref_internal( dab_Module * m, qVariable * var ) 
 {
-	qDeclare * decmatch = 0;
-	for (int i = var->variablesavail.size() - 1; i >= 0; i--)
+	for (std::vector<qDeclare*>::reverse_iterator it = var->variablesavail.rbegin(); it != var->variablesavail.rend(); ++it)
 	{
-		qDeclare * v = var->variablesavail[i];
+		qDeclare * v = *it;
 		if (var->name == v->pretty_name)
 		{
-			decmatch = v;
-
-			var->realname = decmatch->real_name;
-			var->neu_type = decmatch->neu_type;
+			var->realname = v->real_name;
+			var->neu_type = v->neu_type;
 			return;
 		}
 	}

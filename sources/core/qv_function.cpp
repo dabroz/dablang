@@ -89,20 +89,8 @@ bool qFunction::LLVM_build( llvm::Module * module )
 		}
 	}
 
-//	very_raw_funcs[this->func->mangled_name] = func->llvmd;
-
 	return false;
 }
-//
-//Value * qFunction::VarArg( qString mangledName )
-//{
-//	for (int i = 0; i < func->args.size(); i++)
-//	{
-//		FunctionArg fa = func->args[i];
-//		if (mangledName == "_a_"+fa.name) return fa.llvmreef;
-//	}
-//	return 0;
-//}
 
 Value * qFunction::VarLocal( qString mangledName )
 {
@@ -116,32 +104,9 @@ Value * qFunction::VarLocal( qString mangledName )
 	return 0;
 }
 
-//Value * qFunction::VarGlobal( qString realname )
-//{
-//	return 0;
-//	/*qProgram * prog = dynamic_cast<qProgram*>(parent);
-//	qString pname = realname.substr(3);
-//	std::map<qString,qDeclare*>::iterator it = prog->globalvars.find(pname);
-//	if (it == prog->globalvars.end()) 
-//	{
-//		qdterror("Variable not found, even in globals\n");
-//		return 0;
-//	}
-//	Value * ret = it->second->llvmvar;
-//	if (ret == 0)
-//	{
-//		qdterror("found `%s` at `%p`(0) -- declare '%p'\n", realname.c_str(), ret, it->second);
-//	}
-//	return ret;*/
-//}
-
 Value * qFunction::getVariable( qString realname )
 {
-	Value * v2 = VarLocal(realname); if (v2) return v2;
-	//Value * v1 = VarArg(realname); if (v1) return v1;
-	//Value * v3 = VarGlobal(realname); if (v3) return v3;
-	
-	return 0;
+	return VarLocal(realname);
 }
 
 void qFunction::LLVM_update()
