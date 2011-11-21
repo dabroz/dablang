@@ -269,6 +269,11 @@ void PreBuildFunction(dab_Function & fun)
 	//fun.node->LLVM_build(g_Module);
 }
 
+void AddReturnConverts(dab_Function & fun)
+{
+	low_FixReturnConverts(fun.node);
+}
+
 struct qINI
 {
 	std::map<qString, qString> params;
@@ -424,7 +429,7 @@ void dab_Module::BuildCode()
 	ProcessFunctions(BuildFunction);
 
 	Builder.SetInsertPoint(u);
-
+	Builder.CreateRetVoid();
 
 	if (ShouldWriteOutput())
 	{
@@ -488,6 +493,7 @@ DABCORE_API dab_Module * dab_CompileFiles(std::map<qString, qString> & files, da
 	module->ProcessFunctions(BuildFunctions);
 	module->ProcessFunctions(ResolveTypes);
 	module->ProcessFunctions(MoveVarsToStack);
+	module->ProcessFunctions(AddReturnConverts);
 
 	/*
 	v->gatherVariables();
