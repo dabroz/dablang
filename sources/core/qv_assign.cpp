@@ -39,9 +39,9 @@ bool qAssign::LLVM_build( llvm::Module * module )
 		error("assign PTR = 0");
 	}
 
-	qdtprintf("-------------------------\n");
-	llvm_dumpvaluetype("L(ptr)", ptr);
-	llvm_dumpvaluetype("R( v )", v);
+	//qdtprintf("-------------------------\n");
+	//llvm_dumpvaluetype("L(ptr)", ptr);
+	//llvm_dumpvaluetype("R( v )", v);
 
 	Builder.CreateStore(v, ptr, false);
 	return false;

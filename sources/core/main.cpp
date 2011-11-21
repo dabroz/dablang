@@ -386,11 +386,18 @@ void temp_compileToExe(const qString & s)
 
 void dab_Module::AddLoader( const qString & loader, qExternFunc* fun, Function * F ) 
 {
-	BasicBlock *BB = BasicBlock::Create(getGlobalContext(), fun->name, preloader);
-	Builder.SetInsertPoint(BB);
+	BasicBlock & BB = preloader->getEntryBlock();// BasicBlock::Create(getGlobalContext(), fun->name, preloader);
+	Builder.SetInsertPoint(&BB);
 
-	Builder.CreateCast(Instruction::CastOps::BitCast, F, qneu_PrimitiveType::consttype_uint8()->createPointer()->llvm(), "xxx");
+	Value * p = Builder.CreateCast(Instruction::CastOps::BitCast, F, qneu_PrimitiveType::consttype_uint8()->createPointer()->createPointer()->llvm(), "xxx");
 
+	Value * fname = (new qStringConstant(fun->name.c_str()))->BuildValue();
+
+	Function * loadfun = (Function*)this->_functions[loader][0].node->func->llvmd;
+
+	Value *qqq = Builder.CreateCall(loadfun, fname, fun->name);
+
+	Builder.CreateStore(qqq, p);
 
 	std::string Q=PrintModule();
 
@@ -409,10 +416,15 @@ void dab_Module::BuildCode()
 
 	std::vector<Type *> x;
 	preloader = Function::Create(FunctionType::get(llvm::Type::getVoidTy(llvm::getGlobalContext()), x, false), llvm::Function::ExternalLinkage, "!dab_init", g_Module);
+	BasicBlock * u = BasicBlock::Create(getGlobalContext(), "preload", preloader);
+	
 
 	ProcessVariables(BuildVariable);
 	ProcessFunctions(PreBuildFunction);
 	ProcessFunctions(BuildFunction);
+
+	Builder.SetInsertPoint(u);
+
 
 	if (ShouldWriteOutput())
 	{
