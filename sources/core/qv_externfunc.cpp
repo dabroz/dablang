@@ -128,11 +128,9 @@ void qExternFunc::LLVM_prebuild( llvm::Module * module )
 		}
 		else if (_options.count("attrib"))
 		{
-			FP= new llvm::GlobalVariable(*module, 
-				
-				PointerType::getUnqual(GetType()),
-				
-			false, llvm::GlobalVariable::ExternalLinkage, 0, func->mangled_name);
+			Type * t = PointerType::getUnqual(GetType());
+			Constant * init = UndefValue::get(t);
+			FP= new llvm::GlobalVariable(*module, t, false, llvm::GlobalVariable::ExternalLinkage, init, func->mangled_name);
 			//llvm::Function *F = llvm::Function::Create(GetType(),  llvm::Function::ExternalLinkage, func->mangled_name, module);
 
 			//InsertArgs(F);
@@ -160,9 +158,12 @@ void qExternFunc::LLVM_prebuild( llvm::Module * module )
 
 			qString ccfuncname = "loader_" + attrib + "_cc";
 
-			qGlobalVariable * val = the_module->_globals[ccfuncname];
-
-			qString cc = val->children[0]->name; // todo: handle errors
+			if (the_module->_globals.count(ccfuncname))
+			{
+				qGlobalVariable * val = the_module->_globals[ccfuncname];
+				if (val->children.size())
+					callcv = val->children[0]->name; // todo: handle errors
+			}
 		}
 
 		if (F)

@@ -389,7 +389,9 @@ void temp_compileToExe(const qString & s)
 	xx += " \"" + g_INI.params["lib/win"] + "user32.lib\" ";
 	xx += " \"" + g_INI.params["lib/win"] + "kernel32.lib\" ";
 	xx += " \"" + g_INI.params["lib/win"] + "opengl32.lib\" ";
-	win32_run(g_INI.params["tools/ld"].c_str(), ("--subsystem windows -e __f_main_  -o __build.exe __build.o " + xx).c_str());
+	xx += " \"" + g_INI.params["lib/win"] + "gdi32.lib\" ";
+	//xx += " \"" + g_INI.params["lib/cpp"] + "msvcrt.lib\" ";
+	win32_run(g_INI.params["tools/ld"].c_str(), ("-A pe-i386 --subsystem windows -e _dablang_main  -o __build.exe __build.o " + xx).c_str());
 }
 
 void dab_Module::AddLoader( const qString & loader, qExternFunc* fun, Function * F ) 
@@ -433,6 +435,19 @@ void dab_Module::BuildCode()
 
 	Builder.SetInsertPoint(u);
 	Builder.CreateRetVoid();
+
+	std::vector<Type*> vv;
+	Type * it = Type::getInt32Ty(llvm::getGlobalContext());
+	vv.push_back(it);
+	FunctionType* ftt= FunctionType::get(it,vv,false);
+
+	Function * Fmain = Function::Create(ftt, llvm::Function::ExternalLinkage, "dablang_main", g_Module);
+	BasicBlock * mainb = BasicBlock::Create(getGlobalContext(), "entry", Fmain);
+	Builder.SetInsertPoint(mainb);
+	Builder.CreateCall(preloader,"");
+	Value * ret = Builder.CreateCall(_functions["main"][0].node->func->llvmd,"");
+	Builder.CreateRet(ret);
+
 
 	if (ShouldWriteOutput())
 	{
