@@ -418,6 +418,30 @@ struct DABCORE_API dab_Typedef
 	dab_Typedef(qTypedef * t) : node(t), dirty(true) {};
 };
 
+struct DABCORE_API PreloadInfo
+{
+	int priority;
+	bool autoload;
+	qString loader;
+	qExternFunc * fun;
+	llvm::Function * F;
+	PreloadInfo(int priority, bool autoload, qString loader, qExternFunc * fun, llvm::Function * F)
+		: priority(priority), autoload(autoload), loader(loader), fun(fun), F(F)
+	{
+	};
+	bool operator < (const PreloadInfo & o) const
+	{
+		if (priority != o.priority) return priority < o.priority;
+		return fun->name < o.fun->name;
+	}
+};
+
+struct DABCORE_API PreloadFunction
+{
+	qString name;
+	llvm::Function * F;
+};
+
 class DABCORE_API dab_Module
 {
 public:
@@ -435,6 +459,10 @@ public:
 	map_t _typedefs;
 	map_s _structs;
 	map_f _functions;
+
+	std::map<qString, PreloadFunction> _preloaderfun;
+	llvm::Function * GetPreloader(qString name, bool autoload);
+	std::vector<PreloadInfo> _preloaders;
 
 	std::vector<qError> _errors;
 
@@ -456,7 +484,10 @@ public:
 
 	void AddLoader( const qString & loader, qExternFunc* fun, llvm::Function * F ) ;
 
-	llvm::Function * preloader;
+	void CreatePreloaders() ;
+
+
+	//llvm::Function * preloader;
 };
 
 DABCORE_API dab_Module * dab_CompileFiles(std::map<qString, qString> & files, dab_Module * origin);

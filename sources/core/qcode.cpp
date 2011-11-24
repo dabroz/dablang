@@ -157,7 +157,9 @@ void qValue::fireError( bool error, int num, const qString & desc )
 	err.start = loc.cmp_col;
 	err.desc = desc;
 
+	if (error)
 	qdtprintf("ERROR <%s> (%s:%d)\n", desc.c_str(), loc.cmp_file.c_str(), loc.cmp_line);
+
 	//TODO! compileErrors.push_back(err);
 }
 

@@ -28,7 +28,7 @@ void qDeclare::gatherVariables()
 	}*/
 	// local var
 
-	qdtprintf("gathered '%s'\n", pretty_name.c_str());
+	//qdtprintf("gathered '%s'\n", pretty_name.c_str());
 
 	char nn[128];
 	sprintf(nn, "_l_%08X_", this);

@@ -251,20 +251,20 @@ void qValue::error( const char * format, ... )
 
 void BuildFunction(dab_Function & fun)
 {
-	qdtprintf("Building function <%s>\n", fun.node->name.c_str());
+	//qdtprintf("Building function <%s>\n", fun.node->name.c_str());
 	//fun.node->LLVM_prebuild(g_Module);
 	fun.node->LLVM_build(g_Module);
 }
 
 void BuildVariable(qGlobalVariable *var)
 {
-	qdtprintf("Building var <%s>\n", var->name.c_str());
+	//qdtprintf("Building var <%s>\n", var->name.c_str());
 	var->LLVM_build(g_Module);
 }
 
 void PreBuildFunction(dab_Function & fun)
 {
-	qdtprintf("Prebuilding function <%s>\n", fun.node->name.c_str());
+	//qdtprintf("Prebuilding function <%s>\n", fun.node->name.c_str());
 	fun.node->LLVM_prebuild(g_Module);
 	//fun.node->LLVM_build(g_Module);
 }
@@ -394,29 +394,92 @@ void temp_compileToExe(const qString & s)
 	win32_run(g_INI.params["tools/ld"].c_str(), ("-A pe-i386 --subsystem windows -e _dablang_main  -o __build.exe __build.o " + xx).c_str());
 }
 
+
+llvm::Function * dab_Module::GetPreloader( qString name, bool autoload )
+{
+	qString n = "_" + name;
+	if (autoload) n = "@preload";
+	else n = "dablang_preload_" + name;
+
+	if (!_preloaderfun.count(n))
+	{
+		Function * f = g_Module->getFunction(n);
+		//if (f) qdtprintf("%s !!! \n", n.c_str());
+		qdtprintf("getprol %s -> %p\n", n.c_str(), f);
+		if (!f) f = Function::Create(FunctionType::get(llvm::Type::getVoidTy(llvm::getGlobalContext()), false), llvm::Function::ExternalLinkage, n, g_Module);
+		BasicBlock * u = 0;
+		if (f->size())
+			u = &(f->getEntryBlock());
+		else
+			u = BasicBlock::Create(getGlobalContext(), "entry", f);
+		_preloaderfun[n].name = n;
+		_preloaderfun[n].F = f;
+	}
+
+	qdtprintf("%s, %d -> %s\n", name.c_str(), autoload?1:0, n.c_str());
+
+	return _preloaderfun[n].F;
+}
+
+
 void dab_Module::AddLoader( const qString & loader, qExternFunc* fun, Function * F ) 
 {
-	BasicBlock & BB = preloader->getEntryBlock();
-	Builder.SetInsertPoint(&BB);
+	qString pname = "loader_" + loader + "_priority";
+	qString aname = "loader_" + loader + "_auto";
+	int priority = 0;
+	bool autoload = true;
+	if (_globals.count(pname))
+	{
+		priority = _globals[pname]->children[0]->ivalue.x;
+	}
+	if (_globals.count(aname)) 
+	{
+		autoload = _globals[aname]->children[0]->bvalue;
+	}
+	_preloaders.push_back(PreloadInfo(priority, autoload, loader, fun, F));
 
-	Value * p = Builder.CreateCast(Instruction::CastOps::BitCast, F, qneu_PrimitiveType::consttype_uint8()->createPointer()->createPointer()->llvm(), "xxx");
+	//qdtprintf("AddLoader(%d, %d, %s)\n", priority, autoload?1:0, loader.c_str());
+}
 
-	Value * fname = (new qStringConstant(fun->name.c_str(),true))->BuildValue();
+void dab_Module::CreatePreloaders() 
+{
+	std::sort(_preloaders.begin(), _preloaders.end());
 
-	Function * loadfun = (Function*)this->_functions[loader][0].node->func->llvmd;
+	for (std::vector<PreloadInfo>::iterator it = _preloaders.begin(), end = _preloaders.end(); it != end; ++it)
+	{
+		Function * f = GetPreloader(it->loader, it->autoload);
+		BasicBlock & u = f->getEntryBlock();
+		Builder.SetInsertPoint(&u);
 
-	Value *qqq = Builder.CreateCall(loadfun, fname, fun->name);
+		Value * p = Builder.CreateCast(Instruction::CastOps::BitCast, it->F,
+			qneu_PrimitiveType::consttype_uint8()->createPointer()->createPointer()->llvm());
 
-	Builder.CreateStore(qqq, p);
+		Value * fname = (new qStringConstant(it->fun->name.c_str(),true))->BuildValue();
 
+		Function * loadfun = (Function*)this->_functions["loader_"+it->loader][0].node->func->llvmd;
+
+		Value *qqq = Builder.CreateCall(loadfun, fname, it->fun->name);
+
+		Builder.CreateStore(qqq, p);
+	}
+
+	for (std::map<qString, PreloadFunction>::iterator it = _preloaderfun.begin(), end = _preloaderfun.end(); it != end; ++it)
+	{
+		Function * f = it->second.F;
+		BasicBlock & u = f->getEntryBlock();
+		Builder.SetInsertPoint(&u);
+		Builder.CreateRetVoid();
+	}
+	
 	std::string Q=PrintModule();
 
-	setFile("compile_llvm.txt",Q);
+	setFile("compile_loader.txt",Q);
+	
 }
 
 void dab_Module::BuildCode()
 {
-	preloader = 0;
+	//preloader = 0;
 
 	if (g_Module) { delete g_Module; g_Module = 0; }
 	//if (!g_Module)
@@ -424,17 +487,13 @@ void dab_Module::BuildCode()
 		g_Module = CreateModule();
 	}
 
-	std::vector<Type *> x;
-	preloader = Function::Create(FunctionType::get(llvm::Type::getVoidTy(llvm::getGlobalContext()), x, false), llvm::Function::ExternalLinkage, "!dab_init", g_Module);
-	BasicBlock * u = BasicBlock::Create(getGlobalContext(), "preload", preloader);
 	
 
 	ProcessVariables(BuildVariable);
 	ProcessFunctions(PreBuildFunction);
 	ProcessFunctions(BuildFunction);
 
-	Builder.SetInsertPoint(u);
-	Builder.CreateRetVoid();
+	CreatePreloaders();
 
 	std::vector<Type*> vv;
 	Type * it = Type::getInt32Ty(llvm::getGlobalContext());
@@ -444,7 +503,11 @@ void dab_Module::BuildCode()
 	Function * Fmain = Function::Create(ftt, llvm::Function::ExternalLinkage, "dablang_main", g_Module);
 	BasicBlock * mainb = BasicBlock::Create(getGlobalContext(), "entry", Fmain);
 	Builder.SetInsertPoint(mainb);
-	Builder.CreateCall(preloader,"");
+
+	if (_preloaderfun.count("@preload"))
+	{
+		Builder.CreateCall(_preloaderfun["@preload"].F,"");
+	}
 	Value * ret = Builder.CreateCall(_functions["main"][0].node->func->llvmd,"");
 	Builder.CreateRet(ret);
 

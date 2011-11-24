@@ -7,8 +7,7 @@ Value * qFuncall::CreateSubvalue(bool named)
 	if (!func) 
 	{
 		qdterror("NO FUN FOR `%s`", name.c_str());
-	}
-	
+	}	
 	std::vector<Value*> args;
 
 	for (int i = 0; i < L()->size(); i++)
@@ -45,7 +44,23 @@ Value * qFuncall::CreateSubvalue(bool named)
 	else
 		ci = Builder.CreateCall(callee, named?name:"");
 
-	ci->setCallingConv(func->llvmd->getCallingConv());
+	/*if (!dynamic_cast<Function*>(callee))
+	{
+	}
+	else
+	{*/
+
+	//qdtprintf("CALL %s\n", func->name.c_str());
+	if (func->name.find("gl")==0)
+	{
+		ci->setCallingConv(CallingConv::X86_StdCall);
+	}
+//else if (dynamic_cast<Function*>(func->llvmd))
+//{
+	else	ci->setCallingConv(((Function*)func->llvmd)->getCallingConv());
+//}
+//else 
+	//}
 
 	return ci;
 }

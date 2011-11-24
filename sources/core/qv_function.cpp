@@ -36,8 +36,10 @@ llvm::FunctionType *qFunction::GetType()
 
 llvm::Function * qFunction::CreateFun(Module *module)
 {
-	llvm::Function *F = llvm::Function::Create(GetType(),  llvm::Function::ExternalLinkage, func->mangled_name, module);
-
+	qString xname = func->mangled_name;
+	if (this->name.find("dablang_")==0) xname = this->name;
+	llvm::Function *F = llvm::Function::Create(GetType(),  llvm::Function::ExternalLinkage, xname, module);
+	F->setName(xname);
 	InsertArgs(F);
 
 	return F;
@@ -47,7 +49,7 @@ llvm::Function * qFunction::CreateFun(Module *module)
 
 void qFunction::LLVM_prebuild( llvm::Module * module )
 {
-	qdtprintf2("Prebuilding fun `%s`\n", this->name.c_str());
+	//qdtprintf2("Prebuilding fun `%s`\n", this->name.c_str());
 
 	Function * F = 0;//very_raw_funcs[this->func->mangled_name];
 		

@@ -108,6 +108,18 @@ void qBinOp::subupdateType()
 	dt_BaseType * LT1 = L()->neu_type;
 	dt_BaseType * RT1 = R()->neu_type;
 
+	if (LT1->isPointer())
+	{
+		replace_child(L(), new qConvert(qneu_PrimitiveType::type_uint32(), L(), "xxxxx"));
+	}
+	if (RT1->isPointer())
+	{
+		replace_child(R(), new qConvert(qneu_PrimitiveType::type_uint32(), R(), "xxxxx"));
+	}
+
+	LT1 = L()->neu_type;
+	RT1 = R()->neu_type;
+
 	qneu_PrimitiveType * LT = dynamic_cast<qneu_PrimitiveType*>(LT1);
 	qneu_PrimitiveType * RT = dynamic_cast<qneu_PrimitiveType*>(RT1);
 

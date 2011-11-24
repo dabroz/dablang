@@ -21,7 +21,7 @@ void notifyNewType(const qString & name, dt_BaseType * s, qValue * tree )
 
 void notifyStruct(const qString & newTypeName, dt_BaseType * newType, qneu_StructType * st, dab_Module * module) 
 {
-	qdtprintf("'%s' notifies struct '%s%s'\n", newTypeName.c_str(), ((st->isConst())?"const ":""), st->name().c_str());
+	//qdtprintf("'%s' notifies struct '%s%s'\n", newTypeName.c_str(), ((st->isConst())?"const ":""), st->name().c_str());
 	for (int i = 0; i < st->members.size(); i++)
 	{
 		StructMember & sm = st->members[i];

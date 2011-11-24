@@ -32,7 +32,7 @@ qStringConstant::qStringConstant( const char * str , bool raw)
 
 				if (Q == 'n') qq += '\n';
 				else if (Q == '\\') qq += '\\';
-				else if (Q == '\r') qq += '\r';
+				else if (Q == 'r') qq += '\r';
 				else{
 					*(int*)0 = 0;
 				}

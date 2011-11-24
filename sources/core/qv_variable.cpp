@@ -16,6 +16,11 @@ Value * qVariable::getLlvmVariable()
 
 llvm::Value * qVariable::BuildValue()
 {
+	if (name=="EMPTY_WND_PROC")
+	{
+		extern Value * QEMPTY;
+		return QEMPTY;
+	}
 	Value * var = getLlvmVariable();
 	if (!var) 
 	{

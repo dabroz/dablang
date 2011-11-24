@@ -43,6 +43,13 @@ bool qAssign::LLVM_build( llvm::Module * module )
 	//llvm_dumpvaluetype("L(ptr)", ptr);
 	//llvm_dumpvaluetype("R( v )", v);
 
+	if (qR.find("EMPTY_WND_PROC")!=qString::npos)
+	{
+		v = Builder.CreateCast(Instruction::CastOps::BitCast, v, Type::getInt8PtrTy(getGlobalContext()));
+		//llvm_dumpvaluetype("!!!!", v);
+
+	}
+
 	Builder.CreateStore(v, ptr, false);
 	return false;
 }

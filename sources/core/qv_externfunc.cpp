@@ -84,105 +84,97 @@ void qExternFunc::LLVM_prebuild( llvm::Module * module )
 	//bool opengl = false;
 	GlobalVariable * FP = 0;
 
-	/*
-	if ( _options.size())
-	{*/
-		int ee = _options.size();
-		qString callcv = "";
-		//qValueVec & vvvv = _options->children;
-	
-			if ( _options.count("win"))
-			{
-				winflag = true;
-				winname =  _options["win"];
-				if (dllfunname=="") dllfunname = name;
-				callcv = "stdcall";
+	int ee = _options.size();
+	qString callcv = "";
+	//qValueVec & vvvv = _options->children;
 
-				F = llvm::Function::Create(GetType(),  llvm::Function::ExternalLinkage, dllfunname, module);
-				InsertArgs(F);
-				F->deleteBody();
-			}
-			if (_options.count("call"))
-			{
-				callcv = _options["call"];
-			}
-			if (_options.count("dll"))
-			{
-				dllname = _options["dll"];
-				fromdll = true;
-				if (dllfunname=="") dllfunname = name;
-			}
-			if (_options.count("name"))
-			{
-				dllfunname = _options["name"];
-			}
-			/*if (par == "opengl")
-			{
-				opengl = true;
-				if (dllfunname=="") dllfunname = name;
-			}*/
+	if ( _options.count("win"))
+	{
+		winflag = true;
+		winname =  _options["win"];
+		if (dllfunname=="") dllfunname = name;
+		callcv = "stdcall";
+
+		F = llvm::Function::Create(GetType(),  llvm::Function::ExternalLinkage, dllfunname, module);
+		InsertArgs(F);
+		F->deleteBody();
+	}
+	if (_options.count("call"))
+	{
+		callcv = _options["call"];
+	}
+	if (_options.count("dll"))
+	{
+		dllname = _options["dll"];
+		fromdll = true;
+		if (dllfunname=="") dllfunname = name;
+	}
+	if (_options.count("name"))
+	{
+		dllfunname = _options["name"];
+	}
+	/*if (par == "opengl")
+	{
+		opengl = true;
+		if (dllfunname=="") dllfunname = name;
+	}*/
+
+	if (winflag) //static import
+	{
+
+	}
+	else if (_options.count("attrib"))
+	{
+		Type * t = PointerType::getUnqual(GetType());
+		Constant * init = UndefValue::get(t);
+		FP= new llvm::GlobalVariable(*module, t, false, llvm::GlobalVariable::ExternalLinkage, init, func->mangled_name);
 		
-		if (winflag) //static import
-		{
+		//llvm::Function *F = llvm::Function::Create(GetType(),  llvm::Function::ExternalLinkage, func->mangled_name, module);
 
+		//InsertArgs(F);
+
+		//F = FP;
+	}
+	else
+	{		
+		F = CreateFun(module);
+
+		if (_options.count("dablang")) BasicBlock::Create(getGlobalContext(), "entry", F);
+
+	//	qdtprintf("added extern `%s` `%s` %p (%s)\n", this->name.c_str(),this->func->mangled_name.c_str(),F,F->getNameStr().c_str());
+	}
+
+	if (_options.count("attrib"))
+	{
+		qString attrib = _options["attrib"];
+
+		qString ccfuncname = "loader_" + attrib + "_cc";
+
+		if (the_module->_globals.count(ccfuncname))
+		{
+			qGlobalVariable * val = the_module->_globals[ccfuncname];
+			if (val->children.size())
+				callcv = val->children[0]->name; // todo: handle errors
 		}
-		else if (_options.count("attrib"))
-		{
-			Type * t = PointerType::getUnqual(GetType());
-			Constant * init = UndefValue::get(t);
-			FP= new llvm::GlobalVariable(*module, t, false, llvm::GlobalVariable::ExternalLinkage, init, func->mangled_name);
-			//llvm::Function *F = llvm::Function::Create(GetType(),  llvm::Function::ExternalLinkage, func->mangled_name, module);
+	}
 
-			//InsertArgs(F);
-
-			//F = FP;
-		}
-		else
-		{
-			F = CreateFun(module);
-		}
-		/*if (opengl)
-		{
-			glcalls[dllfunname] = F;
-
-			LPVOID funstub = VirtualAllocEx(GetCurrentProcess(), NULL, sizeof(JMPI), MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
-
-			glcalls2[dllfunname] = (JMPI*)funstub;
-
-			TheExecutionEngine->addGlobalMapping(F, funstub);
-		}*/
-
-		if (_options.count("attrib"))
-		{
-			qString attrib = _options["attrib"];
-
-			qString ccfuncname = "loader_" + attrib + "_cc";
-
-			if (the_module->_globals.count(ccfuncname))
-			{
-				qGlobalVariable * val = the_module->_globals[ccfuncname];
-				if (val->children.size())
-					callcv = val->children[0]->name; // todo: handle errors
-			}
-		}
-
-		if (F)
-		{
-			if (callcv == "stdcall") F->setCallingConv(CallingConv::X86_StdCall);
-			if (callcv == "cdecl") F->setCallingConv(CallingConv::C);
-			F->setName(dllfunname);
-		}
+	if (F)
+	{
+		if (callcv == "stdcall") F->setCallingConv(CallingConv::X86_StdCall);
+		if (callcv == "cdecl") F->setCallingConv(CallingConv::C);
+		if (dllfunname!="") F->setName(dllfunname);
+	}
 
 
-		if (fromdll)
-		{
-			HMODULE hm = LoadLibrary(dllname.c_str());
-			void * funp = GetProcAddress(hm, dllfunname.c_str());
+	if (fromdll)
+	{
+		/*HMODULE hm = LoadLibrary(dllname.c_str());
+		void * funp = GetProcAddress(hm, dllfunname.c_str());
 
-			qdtprintf2("LOAD EXTERN %08x %08x <%s -> %s> \n", 
-				(unsigned)hm, (unsigned)funp, dllname.c_str(), dllfunname.c_str());
-			TheExecutionEngine->addGlobalMapping(F, funp);
-		}
+		qdtprintf2("LOAD EXTERN %08x %08x <%s -> %s> \n", 
+			(unsigned)hm, (unsigned)funp, dllname.c_str(), dllfunname.c_str());
+		TheExecutionEngine->addGlobalMapping(F, funp);*/
+	}
 	/*}*/
 	/*else
 	{
@@ -240,7 +232,7 @@ bool qExternFunc::LLVM_build( llvm::Module * module )
 {
 	if (_options.count("attrib"))
 	{
-		the_module->AddLoader("loader_" + _options["attrib"], this, func->llvmd);
+		the_module->AddLoader(_options["attrib"], this, func->llvmd);
 	}
 	return false;
 }
