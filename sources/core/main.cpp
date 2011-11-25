@@ -416,7 +416,7 @@ llvm::Function * dab_Module::GetPreloader( qString name, bool autoload )
 		_preloaderfun[n].F = f;
 	}
 
-	qdtprintf("%s, %d -> %s\n", name.c_str(), autoload?1:0, n.c_str());
+	//qdtprintf("%s, %d -> %s\n", name.c_str(), autoload?1:0, n.c_str());
 
 	return _preloaderfun[n].F;
 }

@@ -10,3 +10,4 @@
 *.exe
 *.aps
 /sources/grammar/dab.output
+build

@@ -39,10 +39,14 @@ Value * qFuncall::CreateSubvalue(bool named)
 		callee = Builder.CreateLoad(callee);
 	}
 
+	qString ssname = name;
+	if (!named) ssname = "";
+	if (((FunctionType*)(callee->getType()))->getReturnType()->isVoidTy()) ssname = "";
+
 	if (args.size()) 
-		ci = Builder.CreateCall(callee, llvm::ArrayRef<Value*>(args), named?name:"");
+		ci = Builder.CreateCall(callee, llvm::ArrayRef<Value*>(args), ssname);
 	else
-		ci = Builder.CreateCall(callee, named?name:"");
+		ci = Builder.CreateCall(callee, ssname);
 
 	/*if (!dynamic_cast<Function*>(callee))
 	{
