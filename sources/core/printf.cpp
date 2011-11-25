@@ -27,6 +27,7 @@ DABCORE_API int qdtprintf(const char * format, ...)
 #ifdef _WIN32
 	OutputDebugString(data);
 #endif
+	printf("%s", data);
 
 	return q;
 }
